@@ -4,13 +4,6 @@ Render configured Circuit JSON drawing pages and part views with PoppyGL outline
 rendering: orthographic black edges, white occluding surfaces, optional dashed
 hidden edges and hatched section cuts.
 
-Visible part edges use a 0.5 mm black stroke. Dimensions and arrowheads are dark
-gray (0.2 mm lines), witness lines are lighter gray (0.15 mm), and measurement
-text stays dark for readability. These weights are in paper millimeters, so the
-outline/annotation hierarchy stays consistent across model scales and export
-resolutions. Existing witness gaps and label backgrounds keep annotations clear
-of the geometry; endpoints and measurement text remain producer-owned.
-
 ## Drawing configuration
 
 `drawing_page` describes paper layout for `<assembly.drawing.page>`.
