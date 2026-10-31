@@ -22,6 +22,7 @@ test("invalid drawing references and allocation requests fail before resolving m
     [page(), { ...view(), drawing_page_id: "missing" }],
     [page(), { ...view(), width: 999 }],
     [page(), { ...view(), scale: 0 }],
+    [page("sheet_1"), page("sheet_2"), view("view_1", "sheet_1")],
   ])
     await expect(
       convertCircuitJsonToDrawingPages(input, options),

@@ -16,6 +16,7 @@ test("resolved lines validate paper data and view associations without resolving
     patch({ drawing_part_view_id: "missing" }),
     patch({ start: { x: NaN, y: 0 } }),
     patch({ start: { x: 0, y: 0 }, end: { x: 0, y: 0 } }),
+    patch({ start: { x: 190, y: 0 }, end: { x: 193, y: 0 } }),
     patch({ text: "" }),
     [...fixture.input, fixture.dimensions[0]!],
     [
