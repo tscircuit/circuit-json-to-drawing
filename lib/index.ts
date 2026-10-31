@@ -45,34 +45,47 @@ export async function convertCircuitJsonToDrawingPages(
     input,
     options.drawingPageId,
   )
-  // Validate allocation limits before starting network or scene work.
-  for (const view of views.filter((v) =>
-    pages.some((s) => s.drawing_page_id === v.drawing_page_id),
-  )) {
-    const width = Math.max(1, Math.round(view.width * pixelsPerMm)),
-      height = Math.max(1, Math.round(view.height * pixelsPerMm))
-    if (
-      width * height * supersampling ** 2 > maxRasterPixels ||
-      !Number.isSafeInteger(width * height * supersampling ** 2)
-    )
-      throw new Error(
-        `Drawing view ${view.drawing_part_view_id} exceeds maxRasterPixels`,
-      )
-  }
-  const output: DrawingPageOutput[] = []
+  const renderedDimensionSvgById = new Map<string, string>()
+  // Validate allocation limits and page/dimension invariants before starting network or scene work.
   for (const page of pages) {
     const pageViews = views.filter(
       (v) => v.drawing_page_id === page.drawing_page_id,
     )
     if (!pageViews.length)
       throw new Error(`Drawing page ${page.drawing_page_id} has no part views`)
+    if (!options.resolveScene)
+      throw new Error(
+        "resolveScene callback is required to resolve configured part geometry",
+      )
+    for (const view of pageViews) {
+      const width = Math.max(1, Math.round(view.width * pixelsPerMm)),
+        height = Math.max(1, Math.round(view.height * pixelsPerMm))
+      if (
+        width * height * supersampling ** 2 > maxRasterPixels ||
+        !Number.isSafeInteger(width * height * supersampling ** 2)
+      )
+        throw new Error(
+          `Drawing view ${view.drawing_part_view_id} exceeds maxRasterPixels`,
+        )
+      for (const line of dimensionLines.filter(
+        (candidate) =>
+          candidate.drawing_part_view_id === view.drawing_part_view_id,
+      )) {
+        renderedDimensionSvgById.set(
+          line.drawing_dimension_line_id,
+          renderDrawingDimensionLine(line, page).svg,
+        )
+      }
+    }
+  }
+  const output: DrawingPageOutput[] = []
+  for (const page of pages) {
+    const pageViews = views.filter(
+      (v) => v.drawing_page_id === page.drawing_page_id,
+    )
     const rendered: Parameters<typeof pageToSvg>[1] = []
     for (const view of pageViews) {
-      if (!options.resolveScene)
-        throw new Error(
-          "resolveScene callback is required to resolve configured part geometry",
-        )
-      const scene = await options.resolveScene(view, input)
+      const scene = await options.resolveScene!(view, input)
       if (!scene.drawCalls.some((dc) => dc.positions.length > 0))
         throw new Error(
           `Part view ${view.drawing_part_view_id} resolved empty geometry`,
@@ -130,7 +143,11 @@ export async function convertCircuitJsonToDrawingPages(
       )
       const dimensionSvg =
         viewLines
-          .map((line) => renderDrawingDimensionLine(line, page).svg)
+          .map(
+            (line) =>
+              renderedDimensionSvgById.get(line.drawing_dimension_line_id) ??
+              renderDrawingDimensionLine(line, page).svg,
+          )
           .join("") +
         (options.showEdgeNames
           ? renderEdgeNames(
