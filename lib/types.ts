@@ -1,16 +1,19 @@
 import type {
+  AnyCircuitElement,
   DrawingDimensionLineInput,
   DrawingPage,
   DrawingPartView,
   DrawingPageTitleBlock,
 } from "circuit-json"
 import type { GLTFScene } from "poppygl"
+import type { DrawingScenePart } from "./assembly"
 
 export interface CircuitElementLike {
   type: string
   [key: string]: unknown
 }
 export type DrawingDocument = readonly (
+  | AnyCircuitElement
   | DrawingDimensionLineInput
   | DrawingPage
   | DrawingPageTitleBlock
@@ -39,6 +42,11 @@ export interface NamedModelEdge extends ResolvedModelEdge {
 }
 
 export interface DrawingOptions {
+  /** Resolve the complete placed scene once, preserving part identity. Required for
+   * assembly/explosion views and part labels; legacy views prefer resolveScene when supplied. */
+  resolveSceneParts?: (
+    circuitJson: DrawingDocument,
+  ) => DrawingScenePart[] | Promise<DrawingScenePart[]>
   /** Select one configured page; omit to render all pages in document order. */
   drawingPageId?: string
   pixelsPerMm?: number

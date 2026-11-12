@@ -10,6 +10,12 @@ import { renderEdgeNames } from "./edge-names"
 import { parseDrawingDocument } from "./document"
 import { getViewOrientation, sectionToGltf } from "./coordinates"
 import { pageToSvg, toBase64 } from "./svg"
+import {
+  parseAssemblyDrawing,
+  resolveAssemblyView,
+  renderAssemblyPageNotes,
+} from "./assembly"
+export * from "./assembly"
 import type {
   DrawingDocument,
   DrawingOptions,
@@ -45,6 +51,10 @@ export async function convertCircuitJsonToDrawingPages(
     input,
     options.drawingPageId,
   )
+  const assembly = parseAssemblyDrawing(input)
+  let parts:
+    | Awaited<ReturnType<NonNullable<DrawingOptions["resolveSceneParts"]>>>
+    | undefined
   // Validate allocation limits before starting network or scene work.
   for (const view of views.filter((v) =>
     pages.some((s) => s.drawing_page_id === v.drawing_page_id),
@@ -68,11 +78,30 @@ export async function convertCircuitJsonToDrawingPages(
       throw new Error(`Drawing page ${page.drawing_page_id} has no part views`)
     const rendered: Parameters<typeof pageToSvg>[1] = []
     for (const view of pageViews) {
-      if (!options.resolveScene)
+      const assemblyView = assembly.views.get(view.drawing_part_view_id)
+      const needsAssembly = Boolean(
+        assemblyView?.drawing_assembly_stage_id ||
+          assemblyView?.drawing_explosion_id ||
+          assembly.labels.some(
+            (l) => l.drawing_part_view_id === view.drawing_part_view_id,
+          ),
+      )
+      if (needsAssembly && !options.resolveSceneParts)
+        throw new Error("Assembly views require resolveSceneParts")
+      if (!options.resolveScene && !options.resolveSceneParts)
         throw new Error(
           "resolveScene callback is required to resolve configured part geometry",
         )
-      const scene = await options.resolveScene(view, input)
+      const useParts =
+        needsAssembly || (!options.resolveScene && !!options.resolveSceneParts)
+      if (useParts && options.resolveSceneParts)
+        parts ??= await options.resolveSceneParts(input)
+      const prepared =
+        useParts && parts
+          ? resolveAssemblyView(view.drawing_part_view_id, parts, assembly)
+          : undefined
+      const scene =
+        prepared?.scene ?? (await options.resolveScene!(view, input))
       if (!scene.drawCalls.some((dc) => dc.positions.length > 0))
         throw new Error(
           `Part view ${view.drawing_part_view_id} resolved empty geometry`,
@@ -120,6 +149,8 @@ export async function convertCircuitJsonToDrawingPages(
         lookAt: center,
         up,
         showHiddenEdges: view.show_hidden_edges ?? false,
+        explosionLines: prepared?.explosionLines,
+        lineWidth: 0.18 * pixelsPerMm,
         orthographicHeight:
           view.scale == null ? null : view.height / view.scale,
       })
@@ -129,6 +160,7 @@ export async function convertCircuitJsonToDrawingPages(
         (line) => line.drawing_part_view_id === view.drawing_part_view_id,
       )
       const dimensionSvg =
+        (prepared?.annotations(page, view, camera) ?? "") +
         viewLines
           .map((line) => renderDrawingDimensionLine(line, page).svg)
           .join("") +
@@ -153,7 +185,7 @@ export async function convertCircuitJsonToDrawingPages(
         titleBlocks.find(
           (block) => block.drawing_page_id === page.drawing_page_id,
         ),
-      ),
+      ).replace("</svg>", renderAssemblyPageNotes(input, page) + "</svg>"),
     })
   }
   return output

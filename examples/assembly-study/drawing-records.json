@@ -1,0 +1,728 @@
+[
+  {
+    "type": "drawing_assembly_stage",
+    "drawing_assembly_stage_id": "pcba",
+    "name": "Populated PCB · fitted parts stay together",
+    "source_component_ids": [
+      "source_component_3",
+      "source_component_4",
+      "source_component_5",
+      "source_component_6",
+      "source_component_7",
+      "source_component_8",
+      "source_component_9",
+      "source_component_10",
+      "source_component_11",
+      "source_component_12",
+      "source_component_13",
+      "source_component_14",
+      "source_component_15",
+      "source_component_16",
+      "source_component_17",
+      "source_component_18",
+      "source_component_19",
+      "source_component_20",
+      "source_component_21",
+      "source_component_22",
+      "source_component_23",
+      "source_component_24",
+      "source_component_25",
+      "source_component_26",
+      "source_component_27",
+      "source_component_28",
+      "source_component_31"
+    ],
+    "pcb_board_ids": ["pcb_board_0"]
+  },
+  {
+    "type": "drawing_assembly_stage",
+    "drawing_assembly_stage_id": "base_bonded",
+    "name": "A1 · Base + attachment ring",
+    "source_component_ids": ["source_component_32", "source_component_34"]
+  },
+  {
+    "type": "drawing_assembly_stage",
+    "drawing_assembly_stage_id": "pcba_loaded",
+    "name": "A2 · PCBA + cell",
+    "source_component_ids": ["source_component_33"],
+    "includes_stage_ids": ["pcba"]
+  },
+  {
+    "type": "drawing_assembly_stage",
+    "drawing_assembly_stage_id": "base_complete",
+    "name": "A3 · Completed stationary assembly",
+    "source_component_ids": ["source_component_35"],
+    "includes_stage_ids": ["base_bonded", "pcba_loaded"]
+  },
+  {
+    "type": "drawing_assembly_stage",
+    "drawing_assembly_stage_id": "cap_bonded",
+    "name": "B1 · Cap + encoder magnet",
+    "source_component_ids": ["source_component_38", "source_component_37"]
+  },
+  {
+    "type": "drawing_assembly_stage",
+    "drawing_assembly_stage_id": "cap_complete",
+    "name": "B2 · Completed rotor assembly",
+    "source_component_ids": ["source_component_36"],
+    "includes_stage_ids": ["cap_bonded"]
+  },
+  {
+    "type": "drawing_assembly_stage",
+    "drawing_assembly_stage_id": "complete",
+    "name": "C · Finished device",
+    "includes_stage_ids": ["base_complete", "cap_complete"]
+  },
+  {
+    "type": "drawing_explosion",
+    "drawing_explosion_id": "overview",
+    "factor": 1,
+    "show_trails": true,
+    "moves": [
+      {
+        "source_component_ids": ["source_component_34"],
+        "translation": {
+          "x": 0,
+          "y": 0,
+          "z": -30
+        }
+      },
+      {
+        "source_component_ids": ["source_component_33"],
+        "translation": {
+          "x": -40,
+          "y": 40,
+          "z": 30
+        }
+      },
+      {
+        "includes_stage_ids": ["pcba"],
+        "translation": {
+          "x": 0,
+          "y": 0,
+          "z": 43
+        }
+      },
+      {
+        "source_component_ids": ["source_component_35"],
+        "translation": {
+          "x": 30,
+          "y": -30,
+          "z": 63
+        }
+      },
+      {
+        "source_component_ids": ["source_component_36"],
+        "translation": {
+          "x": 0,
+          "y": 0,
+          "z": 92
+        }
+      },
+      {
+        "source_component_ids": ["source_component_37"],
+        "translation": {
+          "x": -40,
+          "y": 40,
+          "z": 112
+        }
+      },
+      {
+        "source_component_ids": ["source_component_38"],
+        "translation": {
+          "x": 0,
+          "y": 0,
+          "z": 134
+        }
+      }
+    ]
+  },
+  {
+    "type": "drawing_explosion",
+    "drawing_explosion_id": "bond_ring",
+    "factor": 1,
+    "show_trails": true,
+    "moves": [
+      {
+        "source_component_ids": ["source_component_34"],
+        "translation": {
+          "x": 0,
+          "y": 0,
+          "z": -18
+        }
+      }
+    ]
+  },
+  {
+    "type": "drawing_explosion",
+    "drawing_explosion_id": "insert_cell",
+    "factor": 1,
+    "show_trails": true,
+    "moves": [
+      {
+        "source_component_ids": ["source_component_33"],
+        "translation": {
+          "x": -30,
+          "y": 0,
+          "z": -12
+        }
+      }
+    ]
+  },
+  {
+    "type": "drawing_explosion",
+    "drawing_explosion_id": "seat_pcba",
+    "factor": 1,
+    "show_trails": true,
+    "moves": [
+      {
+        "includes_stage_ids": ["pcba_loaded"],
+        "translation": {
+          "x": 0,
+          "y": 0,
+          "z": 28
+        }
+      },
+      {
+        "source_component_ids": ["source_component_35"],
+        "translation": {
+          "x": 0,
+          "y": 0,
+          "z": 45
+        }
+      }
+    ]
+  },
+  {
+    "type": "drawing_explosion",
+    "drawing_explosion_id": "bond_encoder",
+    "factor": 1,
+    "show_trails": true,
+    "moves": [
+      {
+        "source_component_ids": ["source_component_37"],
+        "translation": {
+          "x": 0,
+          "y": 0,
+          "z": -18
+        }
+      }
+    ]
+  },
+  {
+    "type": "drawing_explosion",
+    "drawing_explosion_id": "seat_bearing",
+    "factor": 1,
+    "show_trails": true,
+    "moves": [
+      {
+        "source_component_ids": ["source_component_36"],
+        "translation": {
+          "x": 0,
+          "y": 0,
+          "z": -20
+        }
+      }
+    ]
+  },
+  {
+    "type": "drawing_explosion",
+    "drawing_explosion_id": "final_join",
+    "factor": 1,
+    "show_trails": true,
+    "moves": [
+      {
+        "includes_stage_ids": ["cap_complete"],
+        "translation": {
+          "x": 0,
+          "y": 0,
+          "z": 40
+        }
+      }
+    ]
+  },
+  {
+    "type": "drawing_page",
+    "drawing_page_id": "01-overview",
+    "name": "Fidget counter / exploded assembly",
+    "width": 297,
+    "height": 297
+  },
+  {
+    "type": "drawing_part_view",
+    "drawing_part_view_id": "overview",
+    "drawing_assembly_stage_id": "complete",
+    "drawing_explosion_id": "overview",
+    "display_name": "01 / COMPLETE EXPLOSION",
+    "center": {
+      "x": -14,
+      "y": 5
+    },
+    "width": 205,
+    "height": 250,
+    "direction": "isometric",
+    "drawing_page_id": "01-overview"
+  },
+  {
+    "type": "drawing_page",
+    "drawing_page_id": "02-base",
+    "name": "A / Stationary subassembly",
+    "width": 297,
+    "height": 210
+  },
+  {
+    "type": "drawing_part_view",
+    "drawing_part_view_id": "ring",
+    "drawing_assembly_stage_id": "base_bonded",
+    "drawing_explosion_id": "bond_ring",
+    "display_name": "A1 / BOND ATTACHMENT RING",
+    "center": {
+      "x": -97,
+      "y": 15
+    },
+    "width": 87,
+    "height": 139,
+    "direction": "isometric",
+    "drawing_page_id": "02-base"
+  },
+  {
+    "type": "drawing_part_view",
+    "drawing_part_view_id": "cell",
+    "drawing_assembly_stage_id": "pcba_loaded",
+    "drawing_explosion_id": "insert_cell",
+    "display_name": "A2 / FIT CELL TO PROGRAMMED PCBA",
+    "center": {
+      "x": 0,
+      "y": 15
+    },
+    "width": 87,
+    "height": 139,
+    "direction": "isometric",
+    "drawing_page_id": "02-base"
+  },
+  {
+    "type": "drawing_part_view",
+    "drawing_part_view_id": "pcba",
+    "drawing_assembly_stage_id": "base_complete",
+    "drawing_explosion_id": "seat_pcba",
+    "display_name": "A3 / LOWER PCBA; FIT TWO SCREWS",
+    "center": {
+      "x": 97,
+      "y": 15
+    },
+    "width": 87,
+    "height": 139,
+    "direction": "isometric",
+    "drawing_page_id": "02-base"
+  },
+  {
+    "type": "drawing_page",
+    "drawing_page_id": "03-cap",
+    "name": "B / Rotor subassembly",
+    "width": 297,
+    "height": 210
+  },
+  {
+    "type": "drawing_part_view",
+    "drawing_part_view_id": "encoder",
+    "drawing_assembly_stage_id": "cap_bonded",
+    "drawing_explosion_id": "bond_encoder",
+    "display_name": "B1 / BOND DIAMETRIC MAGNET",
+    "center": {
+      "x": -72,
+      "y": 15
+    },
+    "width": 130,
+    "height": 139,
+    "direction": "y_negative",
+    "drawing_page_id": "03-cap"
+  },
+  {
+    "type": "drawing_part_view",
+    "drawing_part_view_id": "bearing",
+    "drawing_assembly_stage_id": "cap_complete",
+    "drawing_explosion_id": "seat_bearing",
+    "display_name": "B2 / SEAT BEARING IN CAP",
+    "center": {
+      "x": 72,
+      "y": 15
+    },
+    "width": 130,
+    "height": 139,
+    "direction": "y_negative",
+    "drawing_page_id": "03-cap"
+  },
+  {
+    "type": "drawing_page",
+    "drawing_page_id": "04-final",
+    "name": "C / Join completed subassemblies",
+    "width": 297,
+    "height": 210
+  },
+  {
+    "type": "drawing_part_view",
+    "drawing_part_view_id": "join",
+    "drawing_assembly_stage_id": "complete",
+    "drawing_explosion_id": "final_join",
+    "display_name": "C1 / LOWER COMPLETE ROTOR",
+    "center": {
+      "x": -72,
+      "y": 15
+    },
+    "width": 130,
+    "height": 139,
+    "direction": "isometric",
+    "drawing_page_id": "04-final"
+  },
+  {
+    "type": "drawing_part_view",
+    "drawing_part_view_id": "assembled",
+    "drawing_assembly_stage_id": "complete",
+    "display_name": "C2 / ASSEMBLED",
+    "center": {
+      "x": 72,
+      "y": 15
+    },
+    "width": 130,
+    "height": 139,
+    "direction": "isometric",
+    "drawing_page_id": "04-final"
+  },
+  {
+    "type": "drawing_part_label",
+    "drawing_part_label_id": "source_component_38",
+    "drawing_part_view_id": "overview",
+    "source_component_ids": ["source_component_38"],
+    "text": "01  ROTATING CAP",
+    "anchor": {
+      "x": -24.986888885498047,
+      "y": -0.8095473051071167,
+      "z": 2
+    },
+    "label_position": {
+      "x": 93,
+      "y": 111
+    }
+  },
+  {
+    "type": "drawing_part_label",
+    "drawing_part_label_id": "source_component_37",
+    "drawing_part_view_id": "overview",
+    "source_component_ids": ["source_component_37"],
+    "text": "02  ENCODER MAGNET",
+    "anchor": {
+      "x": -2.4986889362335205,
+      "y": 0.08095470070838928,
+      "z": 4.239999771118164
+    },
+    "label_position": {
+      "x": 93,
+      "y": 76
+    }
+  },
+  {
+    "type": "drawing_part_label",
+    "drawing_part_label_id": "source_component_36",
+    "drawing_part_view_id": "overview",
+    "source_component_ids": ["source_component_36"],
+    "text": "03  6808 BEARING",
+    "anchor": {
+      "x": -21.968473434448242,
+      "y": 0.7117540240287781,
+      "z": 0.26999950408935547
+    },
+    "label_position": {
+      "x": 93,
+      "y": 46
+    }
+  },
+  {
+    "type": "drawing_part_label",
+    "drawing_part_label_id": "source_component_35",
+    "drawing_part_view_id": "overview",
+    "source_component_ids": ["source_component_35"],
+    "text": "04  PCB SCREWS x2",
+    "anchor": {
+      "x": -12.956647872924805,
+      "y": -10.280293464660645,
+      "z": 1.619999885559082
+    },
+    "label_position": {
+      "x": -93,
+      "y": 20
+    }
+  },
+  {
+    "type": "drawing_part_label",
+    "drawing_part_label_id": "pcb_board_0",
+    "drawing_part_view_id": "overview",
+    "pcb_board_ids": ["pcb_board_0"],
+    "text": "05  POPULATED PCB",
+    "anchor": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "label_position": {
+      "x": 93,
+      "y": 2
+    }
+  },
+  {
+    "type": "drawing_part_label",
+    "drawing_part_label_id": "source_component_33",
+    "drawing_part_view_id": "overview",
+    "source_component_ids": ["source_component_33"],
+    "text": "06  CR2450 CELL",
+    "anchor": {
+      "x": -12.243576049804688,
+      "y": 0.39667820930480957,
+      "z": -4.350000381469727
+    },
+    "label_position": {
+      "x": 93,
+      "y": -29
+    }
+  },
+  {
+    "type": "drawing_part_label",
+    "drawing_part_label_id": "source_component_32",
+    "drawing_part_view_id": "overview",
+    "source_component_ids": ["source_component_32"],
+    "text": "07  STATIONARY BASE",
+    "anchor": {
+      "x": -20.98898696899414,
+      "y": -0.6800196766853333,
+      "z": -5.000000476837158
+    },
+    "label_position": {
+      "x": 93,
+      "y": -66
+    }
+  },
+  {
+    "type": "drawing_part_label",
+    "drawing_part_label_id": "source_component_34",
+    "drawing_part_view_id": "overview",
+    "source_component_ids": ["source_component_34"],
+    "text": "08  ATTACHMENT RING",
+    "anchor": {
+      "x": -22.937963485717773,
+      "y": 0.7431644201278687,
+      "z": -8.800000190734863
+    },
+    "label_position": {
+      "x": 93,
+      "y": -106
+    }
+  },
+  {
+    "type": "drawing_page_note",
+    "drawing_page_note_id": "01-overview-title",
+    "drawing_page_id": "01-overview",
+    "position": {
+      "x": -137,
+      "y": 135.5
+    },
+    "text": "FIDGET COUNTER / EXPLODED ASSEMBLY",
+    "font_size": 4.8
+  },
+  {
+    "type": "drawing_page_note",
+    "drawing_page_note_id": "01-overview-subtitle",
+    "drawing_page_id": "01-overview",
+    "position": {
+      "x": -137,
+      "y": 128.5
+    },
+    "text": "Eight line items / nine handled parts / V1 circular cap",
+    "font_size": 2.6
+  },
+  {
+    "type": "drawing_page_note",
+    "drawing_page_note_id": "01-overview-footer",
+    "drawing_page_id": "01-overview",
+    "position": {
+      "x": -137,
+      "y": -139.5
+    },
+    "text": "DRAWING STUDY  /  published geometry 1.0.31  /  offsets illustrative  /  not to scale",
+    "font_size": 2.4
+  },
+  {
+    "type": "drawing_page_note",
+    "drawing_page_note_id": "02-base-title",
+    "drawing_page_id": "02-base",
+    "position": {
+      "x": -137,
+      "y": 92
+    },
+    "text": "A / BUILD THE STATIONARY SUBASSEMBLY",
+    "font_size": 4.8
+  },
+  {
+    "type": "drawing_page_note",
+    "drawing_page_note_id": "02-base-subtitle",
+    "drawing_page_id": "02-base",
+    "position": {
+      "x": -137,
+      "y": 85
+    },
+    "text": "A1 + A2 combine in A3. All fitted electronics remain attached to the PCB.",
+    "font_size": 2.6
+  },
+  {
+    "type": "drawing_page_note",
+    "drawing_page_note_id": "02-base-footer",
+    "drawing_page_id": "02-base",
+    "position": {
+      "x": -137,
+      "y": -96
+    },
+    "text": "DRAWING STUDY  /  published geometry 1.0.31  /  offsets illustrative  /  not to scale",
+    "font_size": 2.4
+  },
+  {
+    "type": "drawing_page_note",
+    "drawing_page_note_id": "03-cap-title",
+    "drawing_page_id": "03-cap",
+    "position": {
+      "x": -137,
+      "y": 92
+    },
+    "text": "B / BUILD THE ROTOR SUBASSEMBLY",
+    "font_size": 4.8
+  },
+  {
+    "type": "drawing_page_note",
+    "drawing_page_note_id": "03-cap-subtitle",
+    "drawing_page_id": "03-cap",
+    "position": {
+      "x": -137,
+      "y": 85
+    },
+    "text": "B1 becomes part of B2. The encoder magnet stays bonded to the cap.",
+    "font_size": 2.6
+  },
+  {
+    "type": "drawing_page_note",
+    "drawing_page_note_id": "03-cap-footer",
+    "drawing_page_id": "03-cap",
+    "position": {
+      "x": -137,
+      "y": -96
+    },
+    "text": "DRAWING STUDY  /  published geometry 1.0.31  /  offsets illustrative  /  not to scale",
+    "font_size": 2.4
+  },
+  {
+    "type": "drawing_page_note",
+    "drawing_page_note_id": "04-final-title",
+    "drawing_page_id": "04-final",
+    "position": {
+      "x": -137,
+      "y": 92
+    },
+    "text": "C / JOIN THE COMPLETED SUBASSEMBLIES",
+    "font_size": 4.8
+  },
+  {
+    "type": "drawing_page_note",
+    "drawing_page_note_id": "04-final-subtitle",
+    "drawing_page_id": "04-final",
+    "position": {
+      "x": -137,
+      "y": 85
+    },
+    "text": "A3 + B2 combine in C1. The complete rotor moves as one unit.",
+    "font_size": 2.6
+  },
+  {
+    "type": "drawing_page_note",
+    "drawing_page_note_id": "04-final-footer",
+    "drawing_page_id": "04-final",
+    "position": {
+      "x": -137,
+      "y": -96
+    },
+    "text": "DRAWING STUDY  /  published geometry 1.0.31  /  offsets illustrative  /  not to scale",
+    "font_size": 2.4
+  },
+  {
+    "type": "drawing_page_note",
+    "drawing_page_note_id": "a1-note",
+    "drawing_page_id": "02-base",
+    "position": {
+      "x": -139,
+      "y": -68
+    },
+    "text": "Ring bonds into underside seat.",
+    "font_size": 2.4
+  },
+  {
+    "type": "drawing_page_note",
+    "drawing_page_note_id": "a2-note",
+    "drawing_page_id": "02-base",
+    "position": {
+      "x": -44,
+      "y": -68
+    },
+    "text": "Program first; then fit CR2450.",
+    "font_size": 2.4
+  },
+  {
+    "type": "drawing_page_note",
+    "drawing_page_note_id": "a3-note",
+    "drawing_page_id": "02-base",
+    "position": {
+      "x": 53,
+      "y": -68
+    },
+    "text": "Seat board; secure opposite posts.",
+    "font_size": 2.4
+  },
+  {
+    "type": "drawing_page_note",
+    "drawing_page_note_id": "b1-note",
+    "drawing_page_id": "03-cap",
+    "position": {
+      "x": -133,
+      "y": -68
+    },
+    "text": "Magnet bonds against the cap's stop.",
+    "font_size": 2.7
+  },
+  {
+    "type": "drawing_page_note",
+    "drawing_page_note_id": "b2-note",
+    "drawing_page_id": "03-cap",
+    "position": {
+      "x": 12,
+      "y": -68
+    },
+    "text": "Bearing seats into the cap's outer fit.",
+    "font_size": 2.7
+  },
+  {
+    "type": "drawing_page_note",
+    "drawing_page_note_id": "c1-note",
+    "drawing_page_id": "04-final",
+    "position": {
+      "x": -133,
+      "y": -68
+    },
+    "text": "Lower rotor onto stationary shaft.",
+    "font_size": 2.7
+  },
+  {
+    "type": "drawing_page_note",
+    "drawing_page_note_id": "c2-note",
+    "drawing_page_id": "04-final",
+    "position": {
+      "x": 12,
+      "y": -68
+    },
+    "text": "Check seating and free rotation.",
+    "font_size": 2.7
+  }
+]

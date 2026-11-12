@@ -229,3 +229,37 @@ JSCAD drawing fixtures from
 [jscad-electronics #504](https://github.com/tscircuit/jscad-electronics/pull/504).
 [Props #953](https://github.com/tscircuit/props/pull/953) defines the higher-level
 TSX authoring intent; eventual core support must resolve it into paper lines.
+
+## Explosions and assembly sub-stages
+
+A part view can reference `drawing_assembly_stage_id` for reusable part membership and `drawing_explosion_id` for a separated drawing pose. Stage records compose source components, PCB substrates and nested stages; a populated PCB or complete rotor can therefore move as one unit. Offsets are simultaneous CAD-world translations from assembled placement, multiplied by the explosion's optional factor (default 1). This is independent of ordered `cad_explosion_stage` playback.
+
+Use `resolveSceneParts` for these views. The callback returns placed PoppyGL draw calls tagged with exactly one `source_component_id` or `pcb_board_id` per entry. Multiple entries with the same identity are supported. The converter loads parts once, expands stage membership, copies model matrices, applies translations and renders with the existing outline pipeline. Cached input geometry is never mutated. `resolveScene` remains supported and is preferred for legacy views when both callbacks are supplied.
+
+```ts
+const pages = await convertCircuitJsonToDrawingPages(circuitJson, {
+  resolveSceneParts: async () => [
+    { source_component_id: "source_cap", drawCalls: capDrawCalls },
+    { pcb_board_id: "pcb_board_0", drawCalls: boardDrawCalls },
+    // Include every selected part, with geometry already placed in glTF +Y-up mm.
+  ],
+})
+```
+
+`drawing_part_label` follows its target's displacement while retaining an authored paper-space text position. `drawing_page_note` adds escaped plain text to a page. Duplicate IDs, unknown references, cyclic stages, overlapping move targets, mismatched label translations, missing selected geometry and invalid scalar configuration are rejected. Native edge samples returned by `resolveModelEdges` must already use the displayed pose; resolved dimension lines and paper label positions are not automatically remeasured or relaid out.
+
+The [fidget-counter example](examples/assembly-study/README.md) includes the actual published geometry, complete Circuit JSON, a runnable renderer and **four visual snapshot tests** covering a full explosion, stationary stages, rotor stages and final assembly.
+
+![Fidget counter full explosion](tests/__snapshots__/fidget-assembly.snap.svg)
+
+![Fidget counter stationary stages](tests/__snapshots__/fidget-assembly-base.snap.svg)
+
+![Fidget counter rotor stages](tests/__snapshots__/fidget-assembly-rotor.snap.svg)
+
+![Fidget counter final join](tests/__snapshots__/fidget-assembly-final.snap.svg)
+
+Schema: https://github.com/tscircuit/circuit-json/pull/1003
+
+TSX props: https://github.com/tscircuit/props/pull/1009
+
+The Circuit JSON dependency is temporarily pinned to the schema PR's immutable preview; replace it with the released version after that PR merges. Core TSX selector resolution/emission remains follow-up work. This implementation provides translation-only drawing poses, not automatic explosion planning, collision-free insertion paths, or vector B-rep output.
