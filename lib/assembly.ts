@@ -1,3 +1,4 @@
+import { isOnPaper, paperToSvg, resolvePaperPosition } from "./paper"
 import type { DrawingView } from "./types"
 import {
   drawingViewId,
@@ -24,6 +25,7 @@ import {
   type DrawingExplosion,
   type DrawingPartLabel,
   type DrawingPage,
+  type DrawingPageNote,
 } from "circuit-json"
 import type { DrawingDocument, DrawingPoint } from "./types"
 import { cadToGltf } from "./coordinates"
@@ -53,18 +55,41 @@ const key = (part: DrawingScenePart) => {
     ? `source:${part.source_component_id}`
     : `board:${part.pcb_board_id}`
 }
+function resolveNotePosition(
+  note: DrawingPageNote,
+  views: Map<string, DrawingView>,
+) {
+  const viewId = annotationViewId(note)
+  const view = viewId ? views.get(viewId) : undefined
+  if (
+    viewId &&
+    (!view ||
+      !annotationTargetsView(note, view) ||
+      view.drawing_page_id !== note.drawing_page_id)
+  )
+    throw Error(
+      "Note references a missing view, wrong view type or a view on another page",
+    )
+  return resolvePaperPosition(note.position, note, view)
+}
 export function renderAssemblyPageNotes(
   input: DrawingDocument,
   page: DrawingPage,
 ) {
+  const views = new Map(
+    input.filter(isDrawingView).map((r) => {
+      const view = parseDrawingView(r)
+      return [drawingViewId(view), view]
+    }),
+  )
   return input
     .filter((r) => r.type === "drawing_page_note")
     .map((r) => drawing_page_note.parse(r))
     .filter((n) => n.drawing_page_id === page.drawing_page_id)
-    .map(
-      (n) =>
-        `<text x="${page.width / 2 + n.position.x}" y="${page.height / 2 - n.position.y}" font-size="${n.font_size ?? 2.7}" fill="#263641">${escapeXml(n.text)}</text>`,
-    )
+    .map((n) => {
+      const p = paperToSvg(resolveNotePosition(n, views), page)
+      return `<text x="${p.x}" y="${p.y}" font-size="${n.font_size ?? 2.7}" fill="#263641">${escapeXml(n.text)}</text>`
+    })
     .join("")
 }
 
@@ -91,11 +116,7 @@ export function parseAssemblyDrawing(input: DrawingDocument) {
       if (noteIds.has(n.drawing_page_note_id))
         throw Error("Duplicate page note ID")
       noteIds.add(n.drawing_page_note_id)
-      if (
-        !page ||
-        Math.abs(n.position.x) > page.width / 2 ||
-        Math.abs(n.position.y) > page.height / 2
-      )
+      if (!page || !isOnPaper(resolveNotePosition(n, views), page))
         throw Error(
           "Page note references a missing page or lies outside its page",
         )
@@ -297,10 +318,7 @@ export function resolveAssemblyView(
       parsedView: DrawingView,
       camera: Camera,
     ) => {
-      const px = (p: { x: number; y: number }) => ({
-        x: page.width / 2 + p.x,
-        y: page.height / 2 - p.y,
-      })
+      const px = (p: { x: number; y: number }) => paperToSvg(p, page)
       return config.labels
         .filter((l) => annotationViewId(l) === viewId)
         .map((l) => {
@@ -327,7 +345,7 @@ export function resolveAssemblyView(
               camera,
             ),
           )
-          const t = px(l.label_position)
+          const t = px(resolvePaperPosition(l.label_position, l, parsedView))
           const left = t.x < p.x
           const end = t.x + (left ? 1 : -1)
           return `<g data-part-label="${escapeXml(l.drawing_part_label_id)}"><path d="M${p.x} ${p.y} L${end} ${t.y}" fill="none" stroke="#677780" stroke-width="0.22"/><circle cx="${p.x}" cy="${p.y}" r="0.55" fill="#253744"/><rect x="${left ? t.x - 36 : t.x}" y="${t.y - 3}" width="36" height="5" fill="white"/><text x="${t.x}" y="${t.y}" text-anchor="${left ? "end" : "start"}" font-size="2.6" fill="#253744">${escapeXml(l.text)}</text></g>`

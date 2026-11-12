@@ -1,3 +1,4 @@
+import { paperToSvg } from "./paper"
 import type { DrawingView } from "./types"
 import { drawingViewId } from "./view"
 import type { DrawingPage, DrawingPageTitleBlock } from "circuit-json"
@@ -28,8 +29,9 @@ export function pageToSvg(
   )
   const images = views
     .map(({ view, pngUrl }, index) => {
-      const x = page.width / 2 + view.center.x - view.width / 2
-      const y = page.height / 2 - view.center.y - view.height / 2
+      const center = paperToSvg(view.center, page)
+      const x = center.x - view.width / 2
+      const y = center.y - view.height / 2
       const name = escapeXml(
         view.display_name ?? view.name ?? drawingViewId(view),
       )

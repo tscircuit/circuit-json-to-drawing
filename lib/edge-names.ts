@@ -1,3 +1,4 @@
+import { paperBounds, paperToSvg } from "./paper"
 import type { DrawingView } from "./types"
 
 import type { DrawingDimensionLine, DrawingPage } from "circuit-json"
@@ -90,6 +91,7 @@ export function renderEdgeNames(
     labels.set(name, { name, anchor })
   }
   if (!labels.size) return ""
+  const bounds = paperBounds(page)
   const margin = 3,
     height = 2.6,
     step = height + 0.8
@@ -112,13 +114,13 @@ export function renderEdgeNames(
     )
     const baseX = clamp(
       anchor.x + 1.5,
-      -page.width / 2 + margin,
-      page.width / 2 - margin - width,
+      bounds.left + margin,
+      bounds.right - margin - width,
     )
     const baseY = clamp(
       anchor.y + 1.5,
-      -page.height / 2 + margin + height / 2,
-      page.height / 2 - margin - height / 2,
+      bounds.bottom + margin + height / 2,
+      bounds.top - margin - height / 2,
     )
     let position: Point | undefined
     const rows = Math.ceil(page.height / step)
@@ -127,13 +129,13 @@ export function renderEdgeNames(
         const row = Math.ceil(attempt / 2) * (attempt % 2 ? 1 : -1)
         const x = clamp(
           baseX + column * (width + 2),
-          -page.width / 2 + margin,
-          page.width / 2 - margin - width,
+          bounds.left + margin,
+          bounds.right - margin - width,
         )
         const y = clamp(
           baseY + row * step,
-          -page.height / 2 + margin + height / 2,
-          page.height / 2 - margin - height / 2,
+          bounds.bottom + margin + height / 2,
+          bounds.top - margin - height / 2,
         )
         const box = {
           left: x - 0.4,
@@ -159,8 +161,9 @@ export function renderEdgeNames(
     }
     if (!position)
       throw new Error("Named feature labels cannot fit within the drawing page")
+    const svgPosition = paperToSvg(position, page)
     output.push(
-      `<text data-drawing-edge-name="${escapeXml(name)}" x="${page.width / 2 + position.x}" y="${page.height / 2 - position.y}" font-size="1.8" textLength="${width}" lengthAdjust="spacingAndGlyphs" fill="#777" stroke="none" dominant-baseline="middle">${escapeXml(name)}</text>`,
+      `<text data-drawing-edge-name="${escapeXml(name)}" x="${svgPosition.x}" y="${svgPosition.y}" font-size="1.8" textLength="${width}" lengthAdjust="spacingAndGlyphs" fill="#777" stroke="none" dominant-baseline="middle">${escapeXml(name)}</text>`,
     )
   }
   return output.join("")

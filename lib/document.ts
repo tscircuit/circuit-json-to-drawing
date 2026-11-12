@@ -1,3 +1,4 @@
+import { paperToSvg } from "./paper"
 import type { DrawingView } from "./types"
 import { drawingViewId, isDrawingView, parseDrawingView } from "./view"
 import {
@@ -75,9 +76,14 @@ export function parseDrawingDocument(
       throw new Error(
         `Drawing view ${drawingViewId(view)} references missing drawing page ${view.drawing_page_id}`,
       )
+    const center = paperToSvg(view.center, page)
     if (
-      Math.abs(view.center.x) + view.width / 2 > page.width / 2 + 1e-9 ||
-      Math.abs(view.center.y) + view.height / 2 > page.height / 2 + 1e-9
+      !Number.isFinite(center.x) ||
+      !Number.isFinite(center.y) ||
+      center.x - view.width / 2 < -1e-9 ||
+      center.x + view.width / 2 > page.width + 1e-9 ||
+      center.y - view.height / 2 < -1e-9 ||
+      center.y + view.height / 2 > page.height + 1e-9
     )
       throw new Error(
         `Drawing view ${drawingViewId(view)} extends outside its page`,
