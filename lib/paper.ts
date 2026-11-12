@@ -2,22 +2,34 @@ import type { DrawingPage } from "circuit-json"
 import type { DrawingView } from "./types"
 type Point = { x: number; y: number }
 
-/** Origin measured from the physical lower-left of the sheet, +Y up. */
-export function drawingOrigin(page: DrawingPage): Point {
-  return page.origin ?? { x: page.width / 2, y: page.height / 2 }
+/** Resolve the named page anchor from the physical lower-left, +Y up. */
+export function drawingAnchor(page: DrawingPage): Point {
+  const anchor = page.anchor_alignment ?? "center"
+  return {
+    x: anchor.endsWith("_left")
+      ? 0
+      : anchor.endsWith("_right")
+        ? page.width
+        : page.width / 2,
+    y: anchor.startsWith("top_")
+      ? page.height
+      : anchor.startsWith("bottom_")
+        ? 0
+        : page.height / 2,
+  }
 }
 export function paperBounds(page: DrawingPage) {
-  const origin = drawingOrigin(page)
+  const anchor = drawingAnchor(page)
   return {
-    left: -origin.x,
-    right: page.width - origin.x,
-    bottom: -origin.y,
-    top: page.height - origin.y,
+    left: -anchor.x,
+    right: page.width - anchor.x,
+    bottom: -anchor.y,
+    top: page.height - anchor.y,
   }
 }
 export function paperToSvg(point: Point, page: DrawingPage): Point {
-  const origin = drawingOrigin(page)
-  return { x: origin.x + point.x, y: page.height - (origin.y + point.y) }
+  const anchor = drawingAnchor(page)
+  return { x: anchor.x + point.x, y: page.height - (anchor.y + point.y) }
 }
 export function isOnPaper(point: Point, page: DrawingPage, margin = 0) {
   const p = paperToSvg(point, page)
@@ -30,7 +42,7 @@ export function isOnPaper(point: Point, page: DrawingPage, margin = 0) {
     p.y <= page.height - margin
   )
 }
-/** Resolve each annotation axis independently into drawing-origin coordinates. */
+/** Resolve each annotation axis independently into page-anchor coordinates. */
 export function resolvePaperPosition(
   position: Partial<Point> | undefined,
   offsets: {

@@ -4,7 +4,7 @@ import { convertCircuitJsonToDrawingSvg } from "../lib"
 import { paperToSvg, resolvePaperPosition } from "../lib/paper"
 import { cadScene } from "./fixtures/models"
 
-test("drawing origins position views, annotations and dimensions while view offsets follow their viewport", async () => {
+test("page anchor alignments position views, annotations and dimensions while view offsets follow their viewport", async () => {
   const scene = cadScene()
   const input: any[] = [
     { type: "source_component", source_component_id: "part" },
@@ -26,7 +26,7 @@ test("drawing origins position views, annotations and dimensions while view offs
       drawing_page_id: "p",
       width: 200,
       height: 140,
-      name: "Configurable origin",
+      name: "Named page anchor",
     },
     {
       type: "drawing_explosion_view",
@@ -54,7 +54,7 @@ test("drawing origins position views, annotations and dimensions while view offs
       drawing_page_note_id: "note",
       drawing_page_id: "p",
       position: { x: -85, y: 57 },
-      text: "Origin: lower-left (0, 0)",
+      text: "Anchor: bottom_left",
     },
     {
       type: "drawing_page_note",
@@ -86,7 +86,7 @@ test("drawing origins position views, annotations and dimensions while view offs
   }
   const baseline = await convertCircuitJsonToDrawingSvg(input, options)
   const shifted = structuredClone(input)
-  shifted[3].origin = { x: 0, y: 0 }
+  shifted[3].anchor_alignment = "bottom_left"
   shifted[4].center = { x: 100, y: 70 }
   // The same drawing uses view-relative labels and mixed per-axis note positioning.
   delete shifted[5].label_position
@@ -124,18 +124,35 @@ test("drawing origins position views, annotations and dimensions while view offs
   expect(movedSvg).toContain('<text x="45" y="45"')
   expect(movedSvg).toContain('<text x="70" y="126"')
   expect(movedSvg).toContain('<text x="15" y="13"')
-  const arbitrary = structuredClone(shifted)
-  arbitrary[3].origin = { x: 12, y: 9 }
-  arbitrary[4].center = { x: 88, y: 61 }
-  arbitrary[6].position = { x: 3, y: 118 }
-  arbitrary[7].position.x -= 12
-  for (const key of ["start", "end", "edge_ref_start", "edge_ref_end"]) {
-    arbitrary[8][key].x -= 12
-    arbitrary[8][key].y -= 9
+  // Re-anchor every absolute coordinate while preserving physical sheet placement.
+  for (const [anchor, ax, ay] of [
+    ["top_left", 0, 140],
+    ["top_center", 100, 140],
+    ["top_right", 200, 140],
+    ["center_left", 0, 70],
+    ["center", 100, 70],
+    ["center_right", 200, 70],
+    ["bottom_left", 0, 0],
+    ["bottom_center", 100, 0],
+    ["bottom_right", 200, 0],
+  ] as const) {
+    const aligned = structuredClone(shifted)
+    aligned[3].anchor_alignment = anchor
+    aligned[4].center = { x: 100 - ax, y: 70 - ay }
+    aligned[6].position = { x: 15 - ax, y: 127 - ay }
+    aligned[7].position.x -= ax
+    for (const key of ["start", "end", "edge_ref_start", "edge_ref_end"]) {
+      aligned[8][key].x -= ax
+      aligned[8][key].y -= ay
+    }
+    expect(paperToSvg({ x: 0, y: 0 }, aligned[3])).toEqual({
+      x: ax,
+      y: 140 - ay,
+    })
+    expect(
+      normalize(await convertCircuitJsonToDrawingSvg(aligned, options)),
+    ).toBe(normalize(svg))
   }
-  expect(
-    normalize(await convertCircuitJsonToDrawingSvg(arbitrary, options)),
-  ).toBe(normalize(svg))
   for (const mutate of [
     (r: any[]) => {
       r[4].center.x = 0

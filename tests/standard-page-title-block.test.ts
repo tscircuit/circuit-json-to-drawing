@@ -50,7 +50,7 @@ test("standard sheet sizes and explicit title blocks render without model or ass
   expect(svg).toContain("1 / 2")
   const lowerLeft = await convertCircuitJsonToDrawingSvg(
     [
-      { ...page, origin: { x: 0, y: 0 } },
+      { ...page, anchor_alignment: "bottom_left" },
       { ...part, center: { x: page.width / 2, y: page.height / 2 + 20 } },
       block,
     ],

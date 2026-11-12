@@ -247,10 +247,7 @@
     "name": "Fidget counter / exploded assembly",
     "width": 297,
     "height": 297,
-    "origin": {
-      "x": 0,
-      "y": 0
-    }
+    "anchor_alignment": "bottom_left"
   },
   {
     "type": "drawing_explosion_view",
@@ -273,10 +270,7 @@
     "name": "A / Stationary subassembly",
     "width": 297,
     "height": 210,
-    "origin": {
-      "x": 0,
-      "y": 0
-    }
+    "anchor_alignment": "bottom_left"
   },
   {
     "type": "drawing_explosion_view",
@@ -329,10 +323,7 @@
     "name": "B / Rotor subassembly",
     "width": 297,
     "height": 210,
-    "origin": {
-      "x": 0,
-      "y": 0
-    }
+    "anchor_alignment": "bottom_left"
   },
   {
     "type": "drawing_explosion_view",
@@ -370,10 +361,7 @@
     "name": "C / Join completed subassemblies",
     "width": 297,
     "height": 210,
-    "origin": {
-      "x": 0,
-      "y": 0
-    }
+    "anchor_alignment": "bottom_left"
   },
   {
     "type": "drawing_explosion_view",

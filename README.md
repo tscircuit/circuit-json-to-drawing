@@ -88,7 +88,7 @@ dangling page references and viewports outside their pages are rejected.
 
 ## Coordinates and scale
 
-Paper dimensions/coordinates are mm. Coordinates are relative to `drawing_page.origin` (default: page center), +X right/+Y up.
+Paper dimensions/coordinates are mm. Coordinates are relative to the page anchor (`anchor_alignment`, default: `center`), +X right/+Y up.
 CAD geometry uses right-handed mm with +Z up. Directions use snake_case:
 `x_positive`, `x_negative`, `y_positive`, `y_negative`, `z_positive`, `z_negative`,
 and `isometric`. The camera sits on the named axis side, looking toward the part
@@ -199,7 +199,7 @@ exporting Circuit JSON. The exporter draws exactly those positions and text:
 }
 ```
 
-All line and witness coordinates are paper mm from the drawing origin, +X right and +Y
+All line and witness coordinates are paper mm from the page anchor, +X right and +Y
 up. Each witness is optional independently. There are no orientation, offset,
 precision, model targets or inferred-view flags on this record. Arrow direction
 and readable text rotation follow the supplied line. Changing a part view does
@@ -266,10 +266,10 @@ The Circuit JSON dependency is temporarily pinned to the schema PR's immutable p
 
 Explosion views have their own `drawing_explosion_view_id`. Labels and resolved dimension lines use that field to attach to an exploded view, or `drawing_part_view_id` to attach to an assembled view (exactly one). `resolveSceneParts` is required for exploded views. The optional native-feature resolver receives either view type; samples for an exploded view must already include the drawing pose.
 
-### Configurable paper origin and view-relative annotations
+### Page anchor alignment and view-relative annotations
 
-Set `drawing_page.origin` to `{ x: 0, y: 0 }` for a lower-left origin, or any finite mm point measured from that corner (+X right, +Y up). Omission retains the centered default. View centers, absolute label/note positions and dimension points all use that drawing origin. Bounds checks use the physical sheet; borders and title blocks remain attached to it.
+Set `drawing_page.anchor_alignment` to `bottom_left` to locate (0, 0) at that corner. It uses the board's nine-point enum: the four corners, four edge centers and `center` (default). Axes stay +X right and +Y up for every anchor. View centers, absolute label/note positions and dimension points all use the selected page anchor. Bounds checks, borders and title blocks stay attached to the physical sheet. The TSX prop is `anchorAlignment`; pages do not take an arbitrary `origin` point.
 
 Labels and notes accept `x_offset_from_view_center` and `y_offset_from_view_center` instead of the corresponding absolute axis in `label_position`/`position`. Each axis needs exactly one mode; mixed modes are allowed. Notes using offsets must reference a view on the same page through its typed ID. In the props API these are `xOffsetFromViewCenter` and `yOffsetFromViewCenter`; a page-level note selects its view with `viewRef`.
 
-The [origin snapshot](tests/__snapshots__/drawing-origin.snap.svg) checks equivalent centered, lower-left and arbitrary origins, mixed annotation modes, viewport movement, dimensions, optional edge labels and physical paper bounds. All four fidget sheets use lower-left origins and view-relative part labels.
+The [anchor-alignment snapshot](tests/__snapshots__/drawing-anchor-alignment.snap.svg) checks equivalent layouts for all nine anchors, mixed annotation modes, viewport movement, dimensions, edge labels and physical paper bounds. All four fidget sheets use `bottom_left` alignment and view-relative part labels.

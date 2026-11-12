@@ -5,7 +5,7 @@ import { drawingStyle } from "./drawing-style"
 
 type Point = DrawingDimensionLine["start"]
 
-/** Render an already resolved dimension in drawing-origin-relative paper mm (+Y up).
+/** Render an already resolved dimension in page-anchor-relative paper mm (+Y up).
  * Model measurement, projection and placement belong to the producer. The
  * exporter preserves both line endpoints and the supplied text verbatim.
  */
