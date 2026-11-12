@@ -40,8 +40,8 @@ test("nested stages explode as rigid groups without mutating source geometry", a
     },
     { type: "drawing_page", drawing_page_id: "p", width: 160, height: 100 },
     {
-      type: "drawing_part_view",
-      drawing_part_view_id: "v",
+      type: "drawing_explosion_view",
+      drawing_explosion_view_id: "v",
       drawing_page_id: "p",
       drawing_assembly_stage_id: "outer",
       drawing_explosion_id: "explode",
@@ -89,6 +89,9 @@ test("nested stages explode as rigid groups without mutating source geometry", a
   const legacy = structuredClone(input)
   delete legacy[6].drawing_assembly_stage_id
   delete legacy[6].drawing_explosion_id
+  legacy[6].type = "drawing_part_view"
+  legacy[6].drawing_part_view_id = "v"
+  delete legacy[6].drawing_explosion_view_id
   legacy[6].source_group_id = "legacy_group"
   await convertCircuitJsonToDrawingPages(legacy, {
     resolveScene: () => {
@@ -109,7 +112,7 @@ test("nested stages explode as rigid groups without mutating source geometry", a
     {
       type: "drawing_part_label",
       drawing_part_label_id: "hidden",
-      drawing_part_view_id: "v",
+      drawing_explosion_view_id: "v",
       source_component_ids: ["a", "b"],
       text: "Group",
       anchor: { x: 0, y: 0, z: 0 },
@@ -149,6 +152,67 @@ test("nested stages explode as rigid groups without mutating source geometry", a
     pixelsPerMm: 1,
   })
   expect(safe!.svg).toContain("&lt;script&gt;&amp;")
+  const noPose = structuredClone(input)
+  delete noPose[6].drawing_explosion_id
+  expect(() => parseAssemblyDrawing(noPose)).toThrow()
+  const unknownPose = structuredClone(input)
+  unknownPose[6].drawing_explosion_id = "missing"
+  expect(() => parseAssemblyDrawing(unknownPose)).toThrow("Unknown explosion")
+  const wrongLabel = structuredClone(hiddenLabel)
+  wrongLabel[7].drawing_part_view_id = "v"
+  delete wrongLabel[7].drawing_explosion_view_id
+  expect(() => parseAssemblyDrawing(wrongLabel)).toThrow("Unknown label view")
+  // Both view kinds share a page without sending explosions to the legacy resolver.
+  const mixed = structuredClone(input)
+  mixed[6].width = 60
+  mixed[6].center.x = -35
+  mixed.push({
+    ...legacy[6],
+    width: 60,
+    center: { x: 35, y: 0 },
+    drawing_part_view_id: "assembled",
+  })
+  mixed.push({
+    type: "drawing_dimension_line",
+    drawing_dimension_line_id: "dimension",
+    drawing_explosion_view_id: "v",
+    start: { x: -50, y: -30 },
+    end: { x: -20, y: -30 },
+    text: "30 mm",
+  })
+  let partCalls = 0
+  let wholeCalls = 0
+  const [mixedPage] = await convertCircuitJsonToDrawingPages(mixed, {
+    resolveSceneParts: () => {
+      partCalls++
+      return parts
+    },
+    resolveScene: () => {
+      wholeCalls++
+      return scene
+    },
+    pixelsPerMm: 1,
+  })
+  expect(partCalls).toBe(1)
+  expect(wholeCalls).toBe(1)
+  expect(mixedPage!.svg).toContain('data-drawing-explosion-view-id="v"')
+  expect(mixedPage!.svg).toContain('data-drawing-part-view-id="assembled"')
+  expect(mixedPage!.svg).toContain("30 mm")
+  const wrongDimension = structuredClone(mixed)
+  wrongDimension[8].drawing_part_view_id = "v"
+  delete wrongDimension[8].drawing_explosion_view_id
+  await expect(
+    convertCircuitJsonToDrawingPages(wrongDimension, {
+      resolveSceneParts: () => parts,
+    }),
+  ).rejects.toThrow("missing drawing view")
+  const duplicate = structuredClone(mixed)
+  duplicate[7].drawing_part_view_id = "v"
+  await expect(
+    convertCircuitJsonToDrawingPages(duplicate, {
+      resolveSceneParts: () => parts,
+    }),
+  ).rejects.toThrow("Duplicate")
   const [page] = await convertCircuitJsonToDrawingPages(input, {
     resolveSceneParts: () => parts,
     pixelsPerMm: 2,

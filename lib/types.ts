@@ -3,10 +3,13 @@ import type {
   DrawingDimensionLineInput,
   DrawingPage,
   DrawingPartView,
+  DrawingExplosionView,
   DrawingPageTitleBlock,
 } from "circuit-json"
 import type { GLTFScene } from "poppygl"
 import type { DrawingScenePart } from "./assembly"
+
+export type DrawingView = DrawingPartView | DrawingExplosionView
 
 export interface CircuitElementLike {
   type: string
@@ -55,11 +58,12 @@ export interface DrawingOptions {
   /** Show small gray feature names. Disabled by default; does not affect lines. */
   showEdgeNames?: boolean
   /** Enumerate native named features only when showEdgeNames is enabled.
-   * Samples are CAD world mm (+Z up), using the same placement as resolveScene.
+   * Samples are CAD world mm (+Z up), using the same placement as the rendered view.
+   * For explosion views the caller must apply the selected drawing pose to samples.
    * This is an optional labeling adapter, never a dimension-measurement input.
    */
   resolveModelEdges?: (
-    partView: DrawingPartView,
+    partView: DrawingView,
     circuitJson: DrawingDocument,
   ) => readonly NamedModelEdge[] | Promise<readonly NamedModelEdge[]>
   /** Resolve the geometry selected by this part view, in glTF +Y-up mm.

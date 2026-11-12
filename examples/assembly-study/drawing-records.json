@@ -2,7 +2,7 @@
   {
     "type": "drawing_assembly_stage",
     "drawing_assembly_stage_id": "pcba",
-    "name": "Populated PCB · fitted parts stay together",
+    "name": "Populated PCB \u00b7 fitted parts stay together",
     "source_component_ids": [
       "source_component_3",
       "source_component_4",
@@ -37,40 +37,40 @@
   {
     "type": "drawing_assembly_stage",
     "drawing_assembly_stage_id": "base_bonded",
-    "name": "A1 · Base + attachment ring",
+    "name": "A1 \u00b7 Base + attachment ring",
     "source_component_ids": ["source_component_32", "source_component_34"]
   },
   {
     "type": "drawing_assembly_stage",
     "drawing_assembly_stage_id": "pcba_loaded",
-    "name": "A2 · PCBA + cell",
+    "name": "A2 \u00b7 PCBA + cell",
     "source_component_ids": ["source_component_33"],
     "includes_stage_ids": ["pcba"]
   },
   {
     "type": "drawing_assembly_stage",
     "drawing_assembly_stage_id": "base_complete",
-    "name": "A3 · Completed stationary assembly",
+    "name": "A3 \u00b7 Completed stationary assembly",
     "source_component_ids": ["source_component_35"],
     "includes_stage_ids": ["base_bonded", "pcba_loaded"]
   },
   {
     "type": "drawing_assembly_stage",
     "drawing_assembly_stage_id": "cap_bonded",
-    "name": "B1 · Cap + encoder magnet",
+    "name": "B1 \u00b7 Cap + encoder magnet",
     "source_component_ids": ["source_component_38", "source_component_37"]
   },
   {
     "type": "drawing_assembly_stage",
     "drawing_assembly_stage_id": "cap_complete",
-    "name": "B2 · Completed rotor assembly",
+    "name": "B2 \u00b7 Completed rotor assembly",
     "source_component_ids": ["source_component_36"],
     "includes_stage_ids": ["cap_bonded"]
   },
   {
     "type": "drawing_assembly_stage",
     "drawing_assembly_stage_id": "complete",
-    "name": "C · Finished device",
+    "name": "C \u00b7 Finished device",
     "includes_stage_ids": ["base_complete", "cap_complete"]
   },
   {
@@ -249,8 +249,7 @@
     "height": 297
   },
   {
-    "type": "drawing_part_view",
-    "drawing_part_view_id": "overview",
+    "type": "drawing_explosion_view",
     "drawing_assembly_stage_id": "complete",
     "drawing_explosion_id": "overview",
     "display_name": "01 / COMPLETE EXPLOSION",
@@ -261,7 +260,8 @@
     "width": 205,
     "height": 250,
     "direction": "isometric",
-    "drawing_page_id": "01-overview"
+    "drawing_page_id": "01-overview",
+    "drawing_explosion_view_id": "overview"
   },
   {
     "type": "drawing_page",
@@ -271,8 +271,7 @@
     "height": 210
   },
   {
-    "type": "drawing_part_view",
-    "drawing_part_view_id": "ring",
+    "type": "drawing_explosion_view",
     "drawing_assembly_stage_id": "base_bonded",
     "drawing_explosion_id": "bond_ring",
     "display_name": "A1 / BOND ATTACHMENT RING",
@@ -283,11 +282,11 @@
     "width": 87,
     "height": 139,
     "direction": "isometric",
-    "drawing_page_id": "02-base"
+    "drawing_page_id": "02-base",
+    "drawing_explosion_view_id": "ring"
   },
   {
-    "type": "drawing_part_view",
-    "drawing_part_view_id": "cell",
+    "type": "drawing_explosion_view",
     "drawing_assembly_stage_id": "pcba_loaded",
     "drawing_explosion_id": "insert_cell",
     "display_name": "A2 / FIT CELL TO PROGRAMMED PCBA",
@@ -298,11 +297,11 @@
     "width": 87,
     "height": 139,
     "direction": "isometric",
-    "drawing_page_id": "02-base"
+    "drawing_page_id": "02-base",
+    "drawing_explosion_view_id": "cell"
   },
   {
-    "type": "drawing_part_view",
-    "drawing_part_view_id": "pcba",
+    "type": "drawing_explosion_view",
     "drawing_assembly_stage_id": "base_complete",
     "drawing_explosion_id": "seat_pcba",
     "display_name": "A3 / LOWER PCBA; FIT TWO SCREWS",
@@ -313,7 +312,8 @@
     "width": 87,
     "height": 139,
     "direction": "isometric",
-    "drawing_page_id": "02-base"
+    "drawing_page_id": "02-base",
+    "drawing_explosion_view_id": "pcba"
   },
   {
     "type": "drawing_page",
@@ -323,8 +323,7 @@
     "height": 210
   },
   {
-    "type": "drawing_part_view",
-    "drawing_part_view_id": "encoder",
+    "type": "drawing_explosion_view",
     "drawing_assembly_stage_id": "cap_bonded",
     "drawing_explosion_id": "bond_encoder",
     "display_name": "B1 / BOND DIAMETRIC MAGNET",
@@ -335,11 +334,11 @@
     "width": 130,
     "height": 139,
     "direction": "y_negative",
-    "drawing_page_id": "03-cap"
+    "drawing_page_id": "03-cap",
+    "drawing_explosion_view_id": "encoder"
   },
   {
-    "type": "drawing_part_view",
-    "drawing_part_view_id": "bearing",
+    "type": "drawing_explosion_view",
     "drawing_assembly_stage_id": "cap_complete",
     "drawing_explosion_id": "seat_bearing",
     "display_name": "B2 / SEAT BEARING IN CAP",
@@ -350,7 +349,8 @@
     "width": 130,
     "height": 139,
     "direction": "y_negative",
-    "drawing_page_id": "03-cap"
+    "drawing_page_id": "03-cap",
+    "drawing_explosion_view_id": "bearing"
   },
   {
     "type": "drawing_page",
@@ -360,8 +360,7 @@
     "height": 210
   },
   {
-    "type": "drawing_part_view",
-    "drawing_part_view_id": "join",
+    "type": "drawing_explosion_view",
     "drawing_assembly_stage_id": "complete",
     "drawing_explosion_id": "final_join",
     "display_name": "C1 / LOWER COMPLETE ROTOR",
@@ -372,7 +371,8 @@
     "width": 130,
     "height": 139,
     "direction": "isometric",
-    "drawing_page_id": "04-final"
+    "drawing_page_id": "04-final",
+    "drawing_explosion_view_id": "join"
   },
   {
     "type": "drawing_part_view",
@@ -391,7 +391,6 @@
   {
     "type": "drawing_part_label",
     "drawing_part_label_id": "source_component_38",
-    "drawing_part_view_id": "overview",
     "source_component_ids": ["source_component_38"],
     "text": "01  ROTATING CAP",
     "anchor": {
@@ -402,12 +401,12 @@
     "label_position": {
       "x": 93,
       "y": 111
-    }
+    },
+    "drawing_explosion_view_id": "overview"
   },
   {
     "type": "drawing_part_label",
     "drawing_part_label_id": "source_component_37",
-    "drawing_part_view_id": "overview",
     "source_component_ids": ["source_component_37"],
     "text": "02  ENCODER MAGNET",
     "anchor": {
@@ -418,12 +417,12 @@
     "label_position": {
       "x": 93,
       "y": 76
-    }
+    },
+    "drawing_explosion_view_id": "overview"
   },
   {
     "type": "drawing_part_label",
     "drawing_part_label_id": "source_component_36",
-    "drawing_part_view_id": "overview",
     "source_component_ids": ["source_component_36"],
     "text": "03  6808 BEARING",
     "anchor": {
@@ -434,12 +433,12 @@
     "label_position": {
       "x": 93,
       "y": 46
-    }
+    },
+    "drawing_explosion_view_id": "overview"
   },
   {
     "type": "drawing_part_label",
     "drawing_part_label_id": "source_component_35",
-    "drawing_part_view_id": "overview",
     "source_component_ids": ["source_component_35"],
     "text": "04  PCB SCREWS x2",
     "anchor": {
@@ -450,12 +449,12 @@
     "label_position": {
       "x": -93,
       "y": 20
-    }
+    },
+    "drawing_explosion_view_id": "overview"
   },
   {
     "type": "drawing_part_label",
     "drawing_part_label_id": "pcb_board_0",
-    "drawing_part_view_id": "overview",
     "pcb_board_ids": ["pcb_board_0"],
     "text": "05  POPULATED PCB",
     "anchor": {
@@ -466,12 +465,12 @@
     "label_position": {
       "x": 93,
       "y": 2
-    }
+    },
+    "drawing_explosion_view_id": "overview"
   },
   {
     "type": "drawing_part_label",
     "drawing_part_label_id": "source_component_33",
-    "drawing_part_view_id": "overview",
     "source_component_ids": ["source_component_33"],
     "text": "06  CR2450 CELL",
     "anchor": {
@@ -482,12 +481,12 @@
     "label_position": {
       "x": 93,
       "y": -29
-    }
+    },
+    "drawing_explosion_view_id": "overview"
   },
   {
     "type": "drawing_part_label",
     "drawing_part_label_id": "source_component_32",
-    "drawing_part_view_id": "overview",
     "source_component_ids": ["source_component_32"],
     "text": "07  STATIONARY BASE",
     "anchor": {
@@ -498,12 +497,12 @@
     "label_position": {
       "x": 93,
       "y": -66
-    }
+    },
+    "drawing_explosion_view_id": "overview"
   },
   {
     "type": "drawing_part_label",
     "drawing_part_label_id": "source_component_34",
-    "drawing_part_view_id": "overview",
     "source_component_ids": ["source_component_34"],
     "text": "08  ATTACHMENT RING",
     "anchor": {
@@ -514,7 +513,8 @@
     "label_position": {
       "x": 93,
       "y": -106
-    }
+    },
+    "drawing_explosion_view_id": "overview"
   },
   {
     "type": "drawing_page_note",

@@ -1,8 +1,6 @@
-import type {
-  DrawingPage,
-  DrawingPartView,
-  DrawingPageTitleBlock,
-} from "circuit-json"
+import type { DrawingView } from "./types"
+import { drawingViewId } from "./view"
+import type { DrawingPage, DrawingPageTitleBlock } from "circuit-json"
 
 export function escapeXml(text: string) {
   return text
@@ -22,7 +20,7 @@ export function toBase64(bytes: Uint8Array): string {
 
 export function pageToSvg(
   page: DrawingPage,
-  views: { view: DrawingPartView; pngUrl: string; dimensionSvg?: string }[],
+  views: { view: DrawingView; pngUrl: string; dimensionSvg?: string }[],
   titleBlock?: DrawingPageTitleBlock,
 ) {
   const title = escapeXml(
@@ -33,7 +31,7 @@ export function pageToSvg(
       const x = page.width / 2 + view.center.x - view.width / 2
       const y = page.height / 2 - view.center.y - view.height / 2
       const name = escapeXml(
-        view.display_name ?? view.name ?? view.drawing_part_view_id,
+        view.display_name ?? view.name ?? drawingViewId(view),
       )
       const scale =
         view.scale == null
@@ -41,7 +39,7 @@ export function pageToSvg(
           : view.scale < 1
             ? `1:${Number((1 / view.scale).toPrecision(6))}`
             : `${view.scale}:1`
-      return `<g data-drawing-part-view-id="${escapeXml(view.drawing_part_view_id)}"><title>${name}</title><clipPath id="viewport-${index}"><rect x="${x}" y="${y}" width="${view.width}" height="${view.height}"/></clipPath><image x="${x}" y="${y}" width="${view.width}" height="${view.height}" preserveAspectRatio="none" clip-path="url(#viewport-${index})" href="${pngUrl}"/><text x="${x + view.width / 2}" y="${y + view.height + 3.5}" text-anchor="middle" font-size="2.8">${name} · ${scale}</text></g>`
+      return `<g data-${view.type === "drawing_explosion_view" ? "drawing-explosion-view-id" : "drawing-part-view-id"}="${escapeXml(drawingViewId(view))}"><title>${name}</title><clipPath id="viewport-${index}"><rect x="${x}" y="${y}" width="${view.width}" height="${view.height}"/></clipPath><image x="${x}" y="${y}" width="${view.width}" height="${view.height}" preserveAspectRatio="none" clip-path="url(#viewport-${index})" href="${pngUrl}"/><text x="${x + view.width / 2}" y="${y + view.height + 3.5}" text-anchor="middle" font-size="2.8">${name} · ${scale}</text></g>`
     })
     .join("")
   const dimensions = views

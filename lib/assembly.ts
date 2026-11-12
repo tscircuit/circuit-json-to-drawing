@@ -1,3 +1,11 @@
+import type { DrawingView } from "./types"
+import {
+  drawingViewId,
+  annotationViewId,
+  annotationTargetsView,
+  isDrawingView,
+  parseDrawingView,
+} from "./view"
 import { mat4 } from "gl-matrix"
 import {
   computeWorldAABB,
@@ -10,13 +18,11 @@ import {
   drawing_explosion,
   drawing_part_label,
   drawing_page_note,
-  drawing_part_view,
   drawing_page,
   type DrawingPartSelection,
   type DrawingAssemblyStage,
   type DrawingExplosion,
   type DrawingPartLabel,
-  type DrawingPartView,
   type DrawingPage,
 } from "circuit-json"
 import type { DrawingDocument, DrawingPoint } from "./types"
@@ -73,12 +79,10 @@ export function parseAssemblyDrawing(input: DrawingDocument) {
     .filter((r) => r.type === "drawing_page")
     .map((r) => drawing_page.parse(r))
   const views = new Map(
-    input
-      .filter((r) => r.type === "drawing_part_view")
-      .map((r) => {
-        const v = drawing_part_view.parse(r)
-        return [v.drawing_part_view_id, v]
-      }),
+    input.filter(isDrawingView).map((r) => {
+      const v = parseDrawingView(r)
+      return [drawingViewId(v), v]
+    }),
   )
   for (const r of input) {
     if (r.type === "drawing_page_note") {
@@ -174,8 +178,9 @@ export function parseAssemblyDrawing(input: DrawingDocument) {
       throw Error(`Unknown explosion: ${v.drawing_explosion_id}`)
   }
   for (const l of labels) {
-    const v = views.get(l.drawing_part_view_id)
-    if (!v) throw Error(`Unknown label view: ${l.drawing_part_view_id}`)
+    const v = views.get(annotationViewId(l))
+    if (!v || !annotationTargetsView(l, v))
+      throw Error(`Unknown label view: ${annotationViewId(l)}`)
     const ids = select(l)
     const visible = v.drawing_assembly_stage_id
       ? select({ includes_stage_ids: [v.drawing_assembly_stage_id] })
@@ -237,7 +242,7 @@ export function resolveAssemblyView(
     if (!available.has(id))
       throw Error(`Scene resolver missing selected geometry: ${id}`)
   for (const label of config.labels.filter(
-    (l) => l.drawing_part_view_id === viewId,
+    (l) => annotationViewId(l) === viewId,
   ))
     for (const id of config.select(label))
       if (!visible.has(id) || !available.has(id))
@@ -289,7 +294,7 @@ export function resolveAssemblyView(
     explosionLines,
     annotations: (
       page: DrawingPage,
-      parsedView: DrawingPartView,
+      parsedView: DrawingView,
       camera: Camera,
     ) => {
       const px = (p: { x: number; y: number }) => ({
@@ -297,7 +302,7 @@ export function resolveAssemblyView(
         y: page.height / 2 - p.y,
       })
       return config.labels
-        .filter((l) => l.drawing_part_view_id === viewId)
+        .filter((l) => annotationViewId(l) === viewId)
         .map((l) => {
           const ids = [...config.select(l)]
           const shift = shifts.get(ids[0]!) ?? { x: 0, y: 0, z: 0 }

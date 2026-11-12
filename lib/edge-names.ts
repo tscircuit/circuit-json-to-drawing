@@ -1,8 +1,6 @@
-import type {
-  DrawingDimensionLine,
-  DrawingPage,
-  DrawingPartView,
-} from "circuit-json"
+import type { DrawingView } from "./types"
+
+import type { DrawingDimensionLine, DrawingPage } from "circuit-json"
 import type { Camera } from "poppygl"
 import { projectDrawingPoint } from "./projection"
 import { renderDrawingDimensionLine } from "./dimensions"
@@ -65,7 +63,7 @@ function featureMidpoint(edge: NamedModelEdge): DrawingPoint {
 export function renderEdgeNames(
   lines: DrawingDimensionLine[],
   edges: readonly NamedModelEdge[],
-  view: DrawingPartView,
+  view: DrawingView,
   page: DrawingPage,
   camera: Camera,
 ): string {

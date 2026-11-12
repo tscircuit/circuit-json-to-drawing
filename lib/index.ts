@@ -1,3 +1,4 @@
+import { drawingViewId, annotationTargetsView } from "./view"
 import {
   computeWorldAABB,
   renderDrawCalls,
@@ -26,6 +27,7 @@ export type {
   DrawingDocument,
   DrawingOptions,
   DrawingPageOutput,
+  DrawingView,
   CircuitElementLike,
   DrawingPoint,
   ResolvedModelEdge,
@@ -66,7 +68,7 @@ export async function convertCircuitJsonToDrawingPages(
       !Number.isSafeInteger(width * height * supersampling ** 2)
     )
       throw new Error(
-        `Drawing view ${view.drawing_part_view_id} exceeds maxRasterPixels`,
+        `Drawing view ${drawingViewId(view)} exceeds maxRasterPixels`,
       )
   }
   const output: DrawingPageOutput[] = []
@@ -75,16 +77,16 @@ export async function convertCircuitJsonToDrawingPages(
       (v) => v.drawing_page_id === page.drawing_page_id,
     )
     if (!pageViews.length)
-      throw new Error(`Drawing page ${page.drawing_page_id} has no part views`)
+      throw new Error(
+        `Drawing page ${page.drawing_page_id} has no drawing views`,
+      )
     const rendered: Parameters<typeof pageToSvg>[1] = []
     for (const view of pageViews) {
-      const assemblyView = assembly.views.get(view.drawing_part_view_id)
+      const assemblyView = assembly.views.get(drawingViewId(view))
       const needsAssembly = Boolean(
         assemblyView?.drawing_assembly_stage_id ||
           assemblyView?.drawing_explosion_id ||
-          assembly.labels.some(
-            (l) => l.drawing_part_view_id === view.drawing_part_view_id,
-          ),
+          assembly.labels.some((l) => annotationTargetsView(l, view)),
       )
       if (needsAssembly && !options.resolveSceneParts)
         throw new Error("Assembly views require resolveSceneParts")
@@ -98,13 +100,17 @@ export async function convertCircuitJsonToDrawingPages(
         parts ??= await options.resolveSceneParts(input)
       const prepared =
         useParts && parts
-          ? resolveAssemblyView(view.drawing_part_view_id, parts, assembly)
+          ? resolveAssemblyView(drawingViewId(view), parts, assembly)
           : undefined
       const scene =
-        prepared?.scene ?? (await options.resolveScene!(view, input))
+        prepared?.scene ??
+        (view.type === "drawing_part_view"
+          ? await options.resolveScene!(view, input)
+          : undefined)
+      if (!scene) throw new Error("Explosion views require resolveSceneParts")
       if (!scene.drawCalls.some((dc) => dc.positions.length > 0))
         throw new Error(
-          `Part view ${view.drawing_part_view_id} resolved empty geometry`,
+          `Drawing view ${drawingViewId(view)} resolved empty geometry`,
         )
       const bounds = computeWorldAABB(scene.drawCalls)
       const center = bounds.min.map((min, i) => (min + bounds.max[i]!) / 2) as [
@@ -134,7 +140,7 @@ export async function convertCircuitJsonToDrawingPages(
         )
       )
         throw new Error(
-          `Part view ${view.drawing_part_view_id} has no retained geometry`,
+          `Drawing view ${drawingViewId(view)} has no retained geometry`,
         )
       const { bitmap, camera } = renderDrawCalls(renderedGeometry, {
         renderStyle: "outline",
@@ -156,8 +162,8 @@ export async function convertCircuitJsonToDrawingPages(
       })
       const png = await encodePNG(bitmap),
         pngUrl = `data:image/png;base64,${toBase64(png)}`
-      const viewLines = dimensionLines.filter(
-        (line) => line.drawing_part_view_id === view.drawing_part_view_id,
+      const viewLines = dimensionLines.filter((line) =>
+        annotationTargetsView(line, view),
       )
       const dimensionSvg =
         (prepared?.annotations(page, view, camera) ?? "") +

@@ -232,7 +232,7 @@ TSX authoring intent; eventual core support must resolve it into paper lines.
 
 ## Explosions and assembly sub-stages
 
-A part view can reference `drawing_assembly_stage_id` for reusable part membership and `drawing_explosion_id` for a separated drawing pose. Stage records compose source components, PCB substrates and nested stages; a populated PCB or complete rotor can therefore move as one unit. Offsets are simultaneous CAD-world translations from assembled placement, multiplied by the explosion's optional factor (default 1). This is independent of ordered `cad_explosion_stage` playback.
+A `drawing_explosion_view` requires `drawing_assembly_stage_id` for reusable part membership and `drawing_explosion_id` for a separated drawing pose. It shares viewport controls with `drawing_part_view`, which always shows assembled geometry and can optionally select a stage. TSX authors use the proposed `<assembly.drawing.explosionview stageRef=".complete" explosionRef=".join" ... />` element. Stage records compose source components, PCB substrates and nested stages; a populated PCB or complete rotor can therefore move as one unit. Offsets are simultaneous CAD-world translations from assembled placement, multiplied by the explosion's optional factor (default 1). This is independent of ordered `cad_explosion_stage` playback.
 
 Use `resolveSceneParts` for these views. The callback returns placed PoppyGL draw calls tagged with exactly one `source_component_id` or `pcb_board_id` per entry. Multiple entries with the same identity are supported. The converter loads parts once, expands stage membership, copies model matrices, applies translations and renders with the existing outline pipeline. Cached input geometry is never mutated. `resolveScene` remains supported and is preferred for legacy views when both callbacks are supplied.
 
@@ -263,3 +263,5 @@ Schema: https://github.com/tscircuit/circuit-json/pull/1003
 TSX props: https://github.com/tscircuit/props/pull/1009
 
 The Circuit JSON dependency is temporarily pinned to the schema PR's immutable preview; replace it with the released version after that PR merges. Core TSX selector resolution/emission remains follow-up work. This implementation provides translation-only drawing poses, not automatic explosion planning, collision-free insertion paths, or vector B-rep output.
+
+Explosion views have their own `drawing_explosion_view_id`. Labels and resolved dimension lines use that field to attach to an exploded view, or `drawing_part_view_id` to attach to an assembled view (exactly one). `resolveSceneParts` is required for exploded views. The optional native-feature resolver receives either view type; samples for an exploded view must already include the drawing pose.

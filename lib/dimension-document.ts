@@ -1,8 +1,6 @@
-import {
-  drawing_dimension_line,
-  type DrawingDimensionLine,
-  type DrawingPartView,
-} from "circuit-json"
+import type { DrawingView } from "./types"
+import { annotationTargetsView } from "./view"
+import { drawing_dimension_line, type DrawingDimensionLine } from "circuit-json"
 import type { DrawingDocument } from "./types"
 
 /** Lines already carry resolved paper positions and text. Model interpretation
@@ -10,7 +8,7 @@ import type { DrawingDocument } from "./types"
  */
 export function parseDrawingDimensionLines(
   input: DrawingDocument,
-  views: DrawingPartView[],
+  views: DrawingView[],
 ) {
   const lines: DrawingDimensionLine[] = []
   const ids = new Set<string>()
@@ -19,12 +17,10 @@ export function parseDrawingDimensionLines(
     const line = drawing_dimension_line.parse(record)
     if (ids.has(line.drawing_dimension_line_id))
       throw new Error("Duplicate drawing dimension line")
-    if (
-      !views.some(
-        (view) => view.drawing_part_view_id === line.drawing_part_view_id,
+    if (!views.some((view) => annotationTargetsView(line, view)))
+      throw new Error(
+        "Drawing dimension line references a missing drawing view",
       )
-    )
-      throw new Error("Drawing dimension line references a missing part view")
     ids.add(line.drawing_dimension_line_id)
     lines.push(line)
   }
