@@ -88,7 +88,7 @@ dangling page references and viewports outside their pages are rejected.
 
 ## Coordinates and scale
 
-Paper dimensions/coordinates are mm. Origin is page center, +X right/+Y up.
+Paper dimensions/coordinates are mm. Coordinates are relative to the page anchor (`anchor_alignment`, default: `center`), +X right/+Y up.
 CAD geometry uses right-handed mm with +Z up. Directions use snake_case:
 `x_positive`, `x_negative`, `y_positive`, `y_negative`, `z_positive`, `z_negative`,
 and `isometric`. The camera sits on the named axis side, looking toward the part
@@ -199,7 +199,7 @@ exporting Circuit JSON. The exporter draws exactly those positions and text:
 }
 ```
 
-All line and witness coordinates are paper mm from page center, +X right and +Y
+All line and witness coordinates are paper mm from the page anchor, +X right and +Y
 up. Each witness is optional independently. There are no orientation, offset,
 precision, model targets or inferred-view flags on this record. Arrow direction
 and readable text rotation follow the supplied line. Changing a part view does
@@ -229,3 +229,47 @@ JSCAD drawing fixtures from
 [jscad-electronics #504](https://github.com/tscircuit/jscad-electronics/pull/504).
 [Props #953](https://github.com/tscircuit/props/pull/953) defines the higher-level
 TSX authoring intent; eventual core support must resolve it into paper lines.
+
+## Explosions and assembly sub-stages
+
+A `drawing_explosion_view` requires `drawing_assembly_stage_id` for reusable part membership and `drawing_explosion_id` for a separated drawing pose. It shares viewport controls with `drawing_part_view`, which always shows assembled geometry and can optionally select a stage. TSX authors use the proposed `<assembly.drawing.explosionview stageRef=".complete" explosionRef=".join" ... />` element. Stage records compose source components, PCB substrates and nested stages; a populated PCB or complete rotor can therefore move as one unit. Offsets are simultaneous CAD-world translations from assembled placement, multiplied by the explosion's optional factor (default 1). This is independent of ordered `cad_explosion_stage` playback.
+
+Use `resolveSceneParts` for these views. The callback returns placed PoppyGL draw calls tagged with exactly one `source_component_id` or `pcb_board_id` per entry. Multiple entries with the same identity are supported. The converter loads parts once, expands stage membership, copies model matrices, applies translations and renders with the existing outline pipeline. Cached input geometry is never mutated. `resolveScene` remains supported and is preferred for legacy views when both callbacks are supplied.
+
+```ts
+const pages = await convertCircuitJsonToDrawingPages(circuitJson, {
+  resolveSceneParts: async () => [
+    { source_component_id: "source_cap", drawCalls: capDrawCalls },
+    { pcb_board_id: "pcb_board_0", drawCalls: boardDrawCalls },
+    // Include every selected part, with geometry already placed in glTF +Y-up mm.
+  ],
+})
+```
+
+`drawing_part_label` follows its target's displacement while retaining an authored paper-space text position. `drawing_page_note` adds escaped plain text to a page. Duplicate IDs, unknown references, cyclic stages, overlapping move targets, mismatched label translations, missing selected geometry and invalid scalar configuration are rejected. Native edge samples returned by `resolveModelEdges` must already use the displayed pose; resolved dimension lines and paper label positions are not automatically remeasured or relaid out.
+
+The [fidget-counter example](examples/assembly-study/README.md) includes the actual published geometry, complete Circuit JSON, a runnable renderer and **four visual snapshot tests** covering a full explosion, stationary stages, rotor stages and final assembly.
+
+![Fidget counter full explosion](tests/__snapshots__/fidget-assembly.snap.svg)
+
+![Fidget counter stationary stages](tests/__snapshots__/fidget-assembly-base.snap.svg)
+
+![Fidget counter rotor stages](tests/__snapshots__/fidget-assembly-rotor.snap.svg)
+
+![Fidget counter final join](tests/__snapshots__/fidget-assembly-final.snap.svg)
+
+Schema: https://github.com/tscircuit/circuit-json/pull/1003
+
+TSX props: https://github.com/tscircuit/props/pull/1009
+
+The Circuit JSON dependency is temporarily pinned to the schema PR's immutable preview; replace it with the released version after that PR merges. Core TSX selector resolution/emission remains follow-up work. This implementation provides translation-only drawing poses, not automatic explosion planning, collision-free insertion paths, or vector B-rep output.
+
+Explosion views have their own `drawing_explosion_view_id`. Labels and resolved dimension lines use that field to attach to an exploded view, or `drawing_part_view_id` to attach to an assembled view (exactly one). `resolveSceneParts` is required for exploded views. The optional native-feature resolver receives either view type; samples for an exploded view must already include the drawing pose.
+
+### Page anchor alignment and view-relative annotations
+
+Set `drawing_page.anchor_alignment` to `bottom_left` to locate (0, 0) at that corner. It uses the board's nine-point enum: the four corners, four edge centers and `center` (default). Axes stay +X right and +Y up for every anchor. View centers, absolute label/note positions and dimension points all use the selected page anchor. Bounds checks, borders and title blocks stay attached to the physical sheet. The TSX prop is `anchorAlignment`; pages do not take an arbitrary `origin` point.
+
+Labels and notes accept `x_offset_from_view_center` and `y_offset_from_view_center` instead of the corresponding absolute axis in `label_position`/`position`. Each axis needs exactly one mode; mixed modes are allowed. Notes using offsets must reference a view on the same page through its typed ID. In the props API these are `xOffsetFromViewCenter` and `yOffsetFromViewCenter`; a page-level note selects its view with `viewRef`.
+
+The [anchor-alignment snapshot](tests/__snapshots__/drawing-anchor-alignment.snap.svg) checks equivalent layouts for all nine anchors, mixed annotation modes, viewport movement, dimensions, edge labels and physical paper bounds. All four fidget sheets use `bottom_left` alignment and view-relative part labels.

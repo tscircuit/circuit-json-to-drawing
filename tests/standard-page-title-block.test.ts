@@ -48,6 +48,15 @@ test("standard sheet sizes and explicit title blocks render without model or ass
   expect(svg).toContain("Housing &lt;outline&gt;")
   expect(svg).toContain("Example &amp; Co")
   expect(svg).toContain("1 / 2")
+  const lowerLeft = await convertCircuitJsonToDrawingSvg(
+    [
+      { ...page, anchor_alignment: "bottom_left" },
+      { ...part, center: { x: page.width / 2, y: page.height / 2 + 20 } },
+      block,
+    ],
+    options,
+  )
+  expect(lowerLeft).toBe(svg)
   const bare = await convertCircuitJsonToDrawingSvg([page, part], options)
   expect(bare).not.toContain("data-drawing-page-title-block-id")
   const before = resolves
