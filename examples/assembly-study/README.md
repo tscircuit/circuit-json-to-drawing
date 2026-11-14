@@ -34,8 +34,8 @@ C1 lowers the completed rotor as one unit onto the stationary assembly. C2 shows
 
 ## Input and provenance
 
-- `drawing-records.json` is the authored drawing configuration. Exploded panels use `drawing_explosion_view`; the assembled final panel uses `drawing_part_view`. Each sheet uses `anchor_alignment: "bottom_left"`; labels use offsets from their view centers and notes use anchor-relative paper coordinates. It uses the schemas from the companion Circuit JSON PR, not embedded images.
-- `drawings.ts` validates those records and applies an optional explosion factor.
+- `drawing-records.json` is the authored drawing configuration. Exploded panels use `drawing_explosion_view` with inline `moves`, `factor` and `show_trails`; the assembled final panel uses `drawing_part_view`. Each sheet uses `anchor_alignment: "bottom_left"`; labels use offsets from their view centers and notes use anchor-relative paper coordinates. It uses the schemas from the companion Circuit JSON PR, not embedded images.
+- `drawings.ts` validates those records and applies an optional factor to each explosion view.
 - `geometry.ts` resolves the GLB's source IDs from node extras. PCB substrate and via plating nodes map to `pcb_board_0`.
 - `fixture.ts` decompresses immutable assets. `provenance.json` records the published release, artifact ID and SHA-256 of the **decompressed** bytes. Gzip timestamps are zero for reproducibility.
 - The original published GLB uses `(-CAD.x, CAD.z, CAD.y)`. The adapter rotates the complete placed scene 180 degrees around glTF Y into canonical `(CAD.x, CAD.z, -CAD.y)`.

@@ -5,7 +5,7 @@ import records from "./drawing-records.json"
 export function createDrawingRecords(factor = 1): AnyCircuitElement[] {
   return records.map((record) =>
     any_circuit_element.parse(
-      record.type === "drawing_explosion" ? { ...record, factor } : record,
+      record.type === "drawing_explosion_view" ? { ...record, factor } : record,
     ),
   )
 }

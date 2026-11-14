@@ -15,13 +15,6 @@ test("page anchor alignments position views, annotations and dimensions while vi
       source_component_ids: ["part"],
     },
     {
-      type: "drawing_explosion",
-      drawing_explosion_id: "pose",
-      moves: [
-        { source_component_ids: ["part"], translation: { x: 0, y: 0, z: 10 } },
-      ],
-    },
-    {
       type: "drawing_page",
       drawing_page_id: "p",
       width: 200,
@@ -33,7 +26,9 @@ test("page anchor alignments position views, annotations and dimensions while vi
       drawing_explosion_view_id: "v",
       drawing_page_id: "p",
       drawing_assembly_stage_id: "stage",
-      drawing_explosion_id: "pose",
+      moves: [
+        { source_component_ids: ["part"], translation: { x: 0, y: 0, z: 10 } },
+      ],
       direction: "isometric",
       center: { x: 0, y: 0 },
       width: 110,
@@ -86,17 +81,17 @@ test("page anchor alignments position views, annotations and dimensions while vi
   }
   const baseline = await convertCircuitJsonToDrawingSvg(input, options)
   const shifted = structuredClone(input)
-  shifted[3].anchor_alignment = "bottom_left"
-  shifted[4].center = { x: 100, y: 70 }
+  shifted[2].anchor_alignment = "bottom_left"
+  shifted[3].center = { x: 100, y: 70 }
   // The same drawing uses view-relative labels and mixed per-axis note positioning.
-  delete shifted[5].label_position
-  shifted[5].x_offset_from_view_center = -65
-  shifted[5].y_offset_from_view_center = 20
-  shifted[6].position = { x: 15, y: 127 }
-  shifted[7].position = { x: 70 }
+  delete shifted[4].label_position
+  shifted[4].x_offset_from_view_center = -65
+  shifted[4].y_offset_from_view_center = 20
+  shifted[5].position = { x: 15, y: 127 }
+  shifted[6].position = { x: 70 }
   for (const key of ["start", "end", "edge_ref_start", "edge_ref_end"]) {
-    shifted[8][key].x += 100
-    shifted[8][key].y += 70
+    shifted[7][key].x += 100
+    shifted[7][key].y += 70
   }
   const svg = await convertCircuitJsonToDrawingSvg(shifted, options)
   const normalize = (s: string) =>
@@ -104,19 +99,19 @@ test("page anchor alignments position views, annotations and dimensions while vi
   expect(normalize(svg)).toBe(normalize(baseline))
   expect(svg).toContain('<text x="15" y="13"')
   expect(svg).toContain('<text x="70" y="131"')
-  expect(paperToSvg({ x: 0, y: 0 }, shifted[3])).toEqual({ x: 0, y: 140 })
-  expect(resolvePaperPosition(undefined, shifted[5], shifted[4])).toEqual({
+  expect(paperToSvg({ x: 0, y: 0 }, shifted[2])).toEqual({ x: 0, y: 140 })
+  expect(resolvePaperPosition(undefined, shifted[4], shifted[3])).toEqual({
     x: 35,
     y: 90,
   })
   const moved = structuredClone(shifted)
-  moved[4].center.x += 10
-  moved[4].center.y += 5
-  expect(resolvePaperPosition(undefined, moved[5], moved[4])).toEqual({
+  moved[3].center.x += 10
+  moved[3].center.y += 5
+  expect(resolvePaperPosition(undefined, moved[4], moved[3])).toEqual({
     x: 45,
     y: 95,
   })
-  expect(resolvePaperPosition(moved[7].position, moved[7], moved[4])).toEqual({
+  expect(resolvePaperPosition(moved[6].position, moved[6], moved[3])).toEqual({
     x: 70,
     y: 14,
   })
@@ -137,15 +132,15 @@ test("page anchor alignments position views, annotations and dimensions while vi
     ["bottom_right", 200, 0],
   ] as const) {
     const aligned = structuredClone(shifted)
-    aligned[3].anchor_alignment = anchor
-    aligned[4].center = { x: 100 - ax, y: 70 - ay }
-    aligned[6].position = { x: 15 - ax, y: 127 - ay }
-    aligned[7].position.x -= ax
+    aligned[2].anchor_alignment = anchor
+    aligned[3].center = { x: 100 - ax, y: 70 - ay }
+    aligned[5].position = { x: 15 - ax, y: 127 - ay }
+    aligned[6].position.x -= ax
     for (const key of ["start", "end", "edge_ref_start", "edge_ref_end"]) {
-      aligned[8][key].x -= ax
-      aligned[8][key].y -= ay
+      aligned[7][key].x -= ax
+      aligned[7][key].y -= ay
     }
-    expect(paperToSvg({ x: 0, y: 0 }, aligned[3])).toEqual({
+    expect(paperToSvg({ x: 0, y: 0 }, aligned[2])).toEqual({
       x: ax,
       y: 140 - ay,
     })
@@ -155,24 +150,24 @@ test("page anchor alignments position views, annotations and dimensions while vi
   }
   for (const mutate of [
     (r: any[]) => {
-      r[4].center.x = 0
+      r[3].center.x = 0
     },
     (r: any[]) => {
-      r[6].position.x = -1
+      r[5].position.x = -1
     },
     (r: any[]) => {
-      r[7].drawing_explosion_view_id = "missing"
+      r[6].drawing_explosion_view_id = "missing"
     },
     (r: any[]) => {
-      r[7].drawing_part_view_id = "v"
-      delete r[7].drawing_explosion_view_id
+      r[6].drawing_part_view_id = "v"
+      delete r[6].drawing_explosion_view_id
     },
     (r: any[]) => {
-      r[7].drawing_page_id = "other"
-      r.push({ ...r[3], drawing_page_id: "other" })
+      r[6].drawing_page_id = "other"
+      r.push({ ...r[2], drawing_page_id: "other" })
     },
     (r: any[]) => {
-      r[8].start.x = -20
+      r[7].start.x = -20
     },
   ]) {
     const invalid = structuredClone(shifted)

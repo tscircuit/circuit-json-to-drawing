@@ -232,7 +232,7 @@ TSX authoring intent; eventual core support must resolve it into paper lines.
 
 ## Explosions and assembly sub-stages
 
-A `drawing_explosion_view` requires `drawing_assembly_stage_id` for reusable part membership and `drawing_explosion_id` for a separated drawing pose. It shares viewport controls with `drawing_part_view`, which always shows assembled geometry and can optionally select a stage. TSX authors use the proposed `<assembly.drawing.explosionview stageRef=".complete" explosionRef=".join" ... />` element. Stage records compose source components, PCB substrates and nested stages; a populated PCB or complete rotor can therefore move as one unit. Offsets are simultaneous CAD-world translations from assembled placement, multiplied by the explosion's optional factor (default 1). This is independent of ordered `cad_explosion_stage` playback.
+A `drawing_explosion_view` requires `drawing_assembly_stage_id` for reusable part membership and inline `moves` for a separated drawing pose. It shares viewport controls with `drawing_part_view`, which always shows assembled geometry and can optionally select a stage. TSX authors use the proposed `<assembly.drawing.explosionview stageRef=".complete" moves={[{ includeStageRefs: [".rotor"], offZ: "40mm" }]} ... />` element. Stage records compose source components, PCB substrates and nested stages; a populated PCB or complete rotor can therefore move as one unit. Offsets are simultaneous CAD-world translations from assembled placement, multiplied by the view's optional factor (default 1). This is independent of ordered `cad_explosion_stage` playback.
 
 Use `resolveSceneParts` for these views. The callback returns placed PoppyGL draw calls tagged with exactly one `source_component_id` or `pcb_board_id` per entry. Multiple entries with the same identity are supported. The converter loads parts once, expands stage membership, copies model matrices, applies translations and renders with the existing outline pipeline. Cached input geometry is never mutated. `resolveScene` remains supported and is preferred for legacy views when both callbacks are supplied.
 
@@ -260,7 +260,7 @@ The [fidget-counter example](examples/assembly-study/README.md) includes the act
 
 Schema: https://github.com/tscircuit/circuit-json/pull/1003
 
-TSX props: https://github.com/tscircuit/props/pull/1009
+TSX props: https://github.com/tscircuit/props/pull/1010
 
 The Circuit JSON dependency is temporarily pinned to the schema PR's immutable preview; replace it with the released version after that PR merges. Core TSX selector resolution/emission remains follow-up work. This implementation provides translation-only drawing poses, not automatic explosion planning, collision-free insertion paths, or vector B-rep output.
 
@@ -273,3 +273,5 @@ Set `drawing_page.anchor_alignment` to `bottom_left` to locate (0, 0) at that co
 Labels and notes accept `x_offset_from_view_center` and `y_offset_from_view_center` instead of the corresponding absolute axis in `label_position`/`position`. Each axis needs exactly one mode; mixed modes are allowed. Notes using offsets must reference a view on the same page through its typed ID. In the props API these are `xOffsetFromViewCenter` and `yOffsetFromViewCenter`; a page-level note selects its view with `viewRef`.
 
 The [anchor-alignment snapshot](tests/__snapshots__/drawing-anchor-alignment.snap.svg) checks equivalent layouts for all nine anchors, mixed annotation modes, viewport movement, dimensions, edge labels and physical paper bounds. All four fidget sheets use `bottom_left` alignment and view-relative part labels.
+
+Explosion settings are local to each view: `moves` is required and nonempty, `factor` defaults to 1 (0 restores assembly), and `show_trails` defaults to false. Move membership must not overlap within a view; different views may use different poses for the same stage. Migrate old documents by copying each standalone `drawing_explosion` configuration into its views and removing `drawing_explosion_id` references. The renderer rejects the removed standalone records.

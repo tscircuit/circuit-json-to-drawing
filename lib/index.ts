@@ -85,7 +85,7 @@ export async function convertCircuitJsonToDrawingPages(
       const assemblyView = assembly.views.get(drawingViewId(view))
       const needsAssembly = Boolean(
         assemblyView?.drawing_assembly_stage_id ||
-          assemblyView?.drawing_explosion_id ||
+          assemblyView?.type === "drawing_explosion_view" ||
           assembly.labels.some((l) => annotationTargetsView(l, view)),
       )
       if (needsAssembly && !options.resolveSceneParts)

@@ -16,13 +16,11 @@ import {
 } from "poppygl"
 import {
   drawing_assembly_stage,
-  drawing_explosion,
   drawing_part_label,
   drawing_page_note,
   drawing_page,
   type DrawingPartSelection,
   type DrawingAssemblyStage,
-  type DrawingExplosion,
   type DrawingPartLabel,
   type DrawingPage,
   type DrawingPageNote,
@@ -35,7 +33,8 @@ import { escapeXml } from "./svg"
 export type {
   DrawingPartSelection,
   DrawingAssemblyStage,
-  DrawingExplosion,
+  DrawingExplosionView,
+  DrawingExplosionMove,
   DrawingPartLabel,
   DrawingPageNote,
 } from "circuit-json"
@@ -95,8 +94,7 @@ export function renderAssemblyPageNotes(
 
 /** Scalar validation belongs to circuit-json; reference/selection validation belongs here. */
 export function parseAssemblyDrawing(input: DrawingDocument) {
-  const stages = new Map<string, DrawingAssemblyStage>(),
-    explosions = new Map<string, DrawingExplosion>()
+  const stages = new Map<string, DrawingAssemblyStage>()
   const labels: DrawingPartLabel[] = [],
     labelIds = new Set<string>(),
     noteIds = new Set<string>()
@@ -127,12 +125,10 @@ export function parseAssemblyDrawing(input: DrawingDocument) {
         throw Error("Duplicate assembly stage ID")
       stages.set(s.drawing_assembly_stage_id, s)
     }
-    if (r.type === "drawing_explosion") {
-      const e = drawing_explosion.parse(r)
-      if (explosions.has(e.drawing_explosion_id))
-        throw Error("Duplicate explosion ID")
-      explosions.set(e.drawing_explosion_id, e)
-    }
+    if (r.type === "drawing_explosion")
+      throw Error(
+        "drawing_explosion was removed; put moves, factor and show_trails on drawing_explosion_view",
+      )
     if (r.type === "drawing_part_label") {
       const l = drawing_part_label.parse(r)
       if (labelIds.has(l.drawing_part_label_id))
@@ -184,7 +180,8 @@ export function parseAssemblyDrawing(input: DrawingDocument) {
   }
   for (const s of stages.values())
     select({ includes_stage_ids: [s.drawing_assembly_stage_id] })
-  for (const e of explosions.values()) {
+  for (const e of views.values()) {
+    if (e.type !== "drawing_explosion_view") continue
     const moved = new Set<string>()
     for (const m of e.moves)
       for (const id of select(m)) {
@@ -195,8 +192,6 @@ export function parseAssemblyDrawing(input: DrawingDocument) {
   for (const v of views.values()) {
     if (v.drawing_assembly_stage_id)
       select({ includes_stage_ids: [v.drawing_assembly_stage_id] })
-    if (v.drawing_explosion_id && !explosions.has(v.drawing_explosion_id))
-      throw Error(`Unknown explosion: ${v.drawing_explosion_id}`)
   }
   for (const l of labels) {
     const v = views.get(annotationViewId(l))
@@ -211,9 +206,7 @@ export function parseAssemblyDrawing(input: DrawingDocument) {
     if (visible)
       for (const id of ids)
         if (!visible.has(id)) throw Error(`Label targets a hidden part: ${id}`)
-    const e = v.drawing_explosion_id
-      ? explosions.get(v.drawing_explosion_id)
-      : undefined
+    const e = v.type === "drawing_explosion_view" ? v : undefined
     const translations = [...ids].map((id) => {
       const m = e?.moves.find((m) => select(m).has(id)),
         f = e?.factor ?? 1
@@ -226,7 +219,7 @@ export function parseAssemblyDrawing(input: DrawingDocument) {
     if (new Set(translations).size > 1)
       throw Error("Label targets parts with different explosion translations")
   }
-  return { stages, explosions, labels, select, views }
+  return { stages, labels, select, views }
 }
 
 export function resolveAssemblyView(
@@ -245,9 +238,7 @@ export function resolveAssemblyView(
     : view.source_component_ids
       ? config.select({ source_component_ids: view.source_component_ids })
       : new Set(parts.map(key))
-  const explosion = view.drawing_explosion_id
-    ? config.explosions.get(view.drawing_explosion_id)
-    : undefined
+  const explosion = view.type === "drawing_explosion_view" ? view : undefined
   const shifts = new Map<string, DrawingPoint>()
   for (const move of explosion?.moves ?? []) {
     const f = explosion?.factor ?? 1

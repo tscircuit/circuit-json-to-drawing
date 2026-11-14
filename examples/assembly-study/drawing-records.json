@@ -74,10 +74,26 @@
     "includes_stage_ids": ["base_complete", "cap_complete"]
   },
   {
-    "type": "drawing_explosion",
-    "drawing_explosion_id": "overview",
-    "factor": 1,
-    "show_trails": true,
+    "type": "drawing_page",
+    "drawing_page_id": "01-overview",
+    "name": "Fidget counter / exploded assembly",
+    "width": 297,
+    "height": 297,
+    "anchor_alignment": "bottom_left"
+  },
+  {
+    "type": "drawing_explosion_view",
+    "drawing_assembly_stage_id": "complete",
+    "display_name": "01 / COMPLETE EXPLOSION",
+    "center": {
+      "x": 134.5,
+      "y": 153.5
+    },
+    "width": 205,
+    "height": 250,
+    "direction": "isometric",
+    "drawing_page_id": "01-overview",
+    "drawing_explosion_view_id": "overview",
     "moves": [
       {
         "source_component_ids": ["source_component_34"],
@@ -135,13 +151,31 @@
           "z": 134
         }
       }
-    ]
+    ],
+    "factor": 1,
+    "show_trails": true
   },
   {
-    "type": "drawing_explosion",
-    "drawing_explosion_id": "bond_ring",
-    "factor": 1,
-    "show_trails": true,
+    "type": "drawing_page",
+    "drawing_page_id": "02-base",
+    "name": "A / Stationary subassembly",
+    "width": 297,
+    "height": 210,
+    "anchor_alignment": "bottom_left"
+  },
+  {
+    "type": "drawing_explosion_view",
+    "drawing_assembly_stage_id": "base_bonded",
+    "display_name": "A1 / BOND ATTACHMENT RING",
+    "center": {
+      "x": 51.5,
+      "y": 120.0
+    },
+    "width": 87,
+    "height": 139,
+    "direction": "isometric",
+    "drawing_page_id": "02-base",
+    "drawing_explosion_view_id": "ring",
     "moves": [
       {
         "source_component_ids": ["source_component_34"],
@@ -151,13 +185,23 @@
           "z": -18
         }
       }
-    ]
+    ],
+    "factor": 1,
+    "show_trails": true
   },
   {
-    "type": "drawing_explosion",
-    "drawing_explosion_id": "insert_cell",
-    "factor": 1,
-    "show_trails": true,
+    "type": "drawing_explosion_view",
+    "drawing_assembly_stage_id": "pcba_loaded",
+    "display_name": "A2 / FIT CELL TO PROGRAMMED PCBA",
+    "center": {
+      "x": 148.5,
+      "y": 120.0
+    },
+    "width": 87,
+    "height": 139,
+    "direction": "isometric",
+    "drawing_page_id": "02-base",
+    "drawing_explosion_view_id": "cell",
     "moves": [
       {
         "source_component_ids": ["source_component_33"],
@@ -167,13 +211,23 @@
           "z": -12
         }
       }
-    ]
+    ],
+    "factor": 1,
+    "show_trails": true
   },
   {
-    "type": "drawing_explosion",
-    "drawing_explosion_id": "seat_pcba",
-    "factor": 1,
-    "show_trails": true,
+    "type": "drawing_explosion_view",
+    "drawing_assembly_stage_id": "base_complete",
+    "display_name": "A3 / LOWER PCBA; FIT TWO SCREWS",
+    "center": {
+      "x": 245.5,
+      "y": 120.0
+    },
+    "width": 87,
+    "height": 139,
+    "direction": "isometric",
+    "drawing_page_id": "02-base",
+    "drawing_explosion_view_id": "pcba",
     "moves": [
       {
         "includes_stage_ids": ["pcba_loaded"],
@@ -191,131 +245,9 @@
           "z": 45
         }
       }
-    ]
-  },
-  {
-    "type": "drawing_explosion",
-    "drawing_explosion_id": "bond_encoder",
+    ],
     "factor": 1,
-    "show_trails": true,
-    "moves": [
-      {
-        "source_component_ids": ["source_component_37"],
-        "translation": {
-          "x": 0,
-          "y": 0,
-          "z": -18
-        }
-      }
-    ]
-  },
-  {
-    "type": "drawing_explosion",
-    "drawing_explosion_id": "seat_bearing",
-    "factor": 1,
-    "show_trails": true,
-    "moves": [
-      {
-        "source_component_ids": ["source_component_36"],
-        "translation": {
-          "x": 0,
-          "y": 0,
-          "z": -20
-        }
-      }
-    ]
-  },
-  {
-    "type": "drawing_explosion",
-    "drawing_explosion_id": "final_join",
-    "factor": 1,
-    "show_trails": true,
-    "moves": [
-      {
-        "includes_stage_ids": ["cap_complete"],
-        "translation": {
-          "x": 0,
-          "y": 0,
-          "z": 40
-        }
-      }
-    ]
-  },
-  {
-    "type": "drawing_page",
-    "drawing_page_id": "01-overview",
-    "name": "Fidget counter / exploded assembly",
-    "width": 297,
-    "height": 297,
-    "anchor_alignment": "bottom_left"
-  },
-  {
-    "type": "drawing_explosion_view",
-    "drawing_assembly_stage_id": "complete",
-    "drawing_explosion_id": "overview",
-    "display_name": "01 / COMPLETE EXPLOSION",
-    "center": {
-      "x": 134.5,
-      "y": 153.5
-    },
-    "width": 205,
-    "height": 250,
-    "direction": "isometric",
-    "drawing_page_id": "01-overview",
-    "drawing_explosion_view_id": "overview"
-  },
-  {
-    "type": "drawing_page",
-    "drawing_page_id": "02-base",
-    "name": "A / Stationary subassembly",
-    "width": 297,
-    "height": 210,
-    "anchor_alignment": "bottom_left"
-  },
-  {
-    "type": "drawing_explosion_view",
-    "drawing_assembly_stage_id": "base_bonded",
-    "drawing_explosion_id": "bond_ring",
-    "display_name": "A1 / BOND ATTACHMENT RING",
-    "center": {
-      "x": 51.5,
-      "y": 120.0
-    },
-    "width": 87,
-    "height": 139,
-    "direction": "isometric",
-    "drawing_page_id": "02-base",
-    "drawing_explosion_view_id": "ring"
-  },
-  {
-    "type": "drawing_explosion_view",
-    "drawing_assembly_stage_id": "pcba_loaded",
-    "drawing_explosion_id": "insert_cell",
-    "display_name": "A2 / FIT CELL TO PROGRAMMED PCBA",
-    "center": {
-      "x": 148.5,
-      "y": 120.0
-    },
-    "width": 87,
-    "height": 139,
-    "direction": "isometric",
-    "drawing_page_id": "02-base",
-    "drawing_explosion_view_id": "cell"
-  },
-  {
-    "type": "drawing_explosion_view",
-    "drawing_assembly_stage_id": "base_complete",
-    "drawing_explosion_id": "seat_pcba",
-    "display_name": "A3 / LOWER PCBA; FIT TWO SCREWS",
-    "center": {
-      "x": 245.5,
-      "y": 120.0
-    },
-    "width": 87,
-    "height": 139,
-    "direction": "isometric",
-    "drawing_page_id": "02-base",
-    "drawing_explosion_view_id": "pcba"
+    "show_trails": true
   },
   {
     "type": "drawing_page",
@@ -328,7 +260,6 @@
   {
     "type": "drawing_explosion_view",
     "drawing_assembly_stage_id": "cap_bonded",
-    "drawing_explosion_id": "bond_encoder",
     "display_name": "B1 / BOND DIAMETRIC MAGNET",
     "center": {
       "x": 76.5,
@@ -338,12 +269,23 @@
     "height": 139,
     "direction": "y_negative",
     "drawing_page_id": "03-cap",
-    "drawing_explosion_view_id": "encoder"
+    "drawing_explosion_view_id": "encoder",
+    "moves": [
+      {
+        "source_component_ids": ["source_component_37"],
+        "translation": {
+          "x": 0,
+          "y": 0,
+          "z": -18
+        }
+      }
+    ],
+    "factor": 1,
+    "show_trails": true
   },
   {
     "type": "drawing_explosion_view",
     "drawing_assembly_stage_id": "cap_complete",
-    "drawing_explosion_id": "seat_bearing",
     "display_name": "B2 / SEAT BEARING IN CAP",
     "center": {
       "x": 220.5,
@@ -353,7 +295,19 @@
     "height": 139,
     "direction": "y_negative",
     "drawing_page_id": "03-cap",
-    "drawing_explosion_view_id": "bearing"
+    "drawing_explosion_view_id": "bearing",
+    "moves": [
+      {
+        "source_component_ids": ["source_component_36"],
+        "translation": {
+          "x": 0,
+          "y": 0,
+          "z": -20
+        }
+      }
+    ],
+    "factor": 1,
+    "show_trails": true
   },
   {
     "type": "drawing_page",
@@ -366,7 +320,6 @@
   {
     "type": "drawing_explosion_view",
     "drawing_assembly_stage_id": "complete",
-    "drawing_explosion_id": "final_join",
     "display_name": "C1 / LOWER COMPLETE ROTOR",
     "center": {
       "x": 76.5,
@@ -376,7 +329,19 @@
     "height": 139,
     "direction": "isometric",
     "drawing_page_id": "04-final",
-    "drawing_explosion_view_id": "join"
+    "drawing_explosion_view_id": "join",
+    "moves": [
+      {
+        "includes_stage_ids": ["cap_complete"],
+        "translation": {
+          "x": 0,
+          "y": 0,
+          "z": 40
+        }
+      }
+    ],
+    "factor": 1,
+    "show_trails": true
   },
   {
     "type": "drawing_part_view",

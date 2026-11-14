@@ -9,6 +9,7 @@ import { loadFidgetFixture } from "../examples/assembly-study/fixture"
 
 test("published fidget fixture retains a complete PCBA and joins the rotor as one subassembly", async () => {
   const { input, parts } = await loadFidgetFixture()
+  expect(input.some((r) => r.type === "drawing_explosion")).toBe(false)
   const before = JSON.stringify(input)
   const config = parseAssemblyDrawing(input)
   expect(config.select({ includes_stage_ids: ["pcba"] }).size).toBe(28)
