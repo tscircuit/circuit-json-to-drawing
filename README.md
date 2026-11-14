@@ -223,16 +223,16 @@ remain with STEP/glTF/JSCAD readers, outside Circuit JSON.
 
 ![Bore width and outside width](tests/__snapshots__/view-extent-dimensions.snap.svg)
 
-This proposal consumes the schema preview from
-[Circuit JSON #922](https://github.com/tscircuit/circuit-json/pull/922) and native
-JSCAD drawing fixtures from
+The dimension schema from
+[Circuit JSON #922](https://github.com/tscircuit/circuit-json/pull/922) is included in the released Circuit JSON dependency. Native
+JSCAD drawing fixtures come from
 [jscad-electronics #504](https://github.com/tscircuit/jscad-electronics/pull/504).
 [Props #953](https://github.com/tscircuit/props/pull/953) defines the higher-level
 TSX authoring intent; eventual core support must resolve it into paper lines.
 
 ## Explosions and assembly sub-stages
 
-A `drawing_explosion_view` requires `drawing_assembly_stage_id` for reusable part membership and inline `moves` for a separated drawing pose. It shares viewport controls with `drawing_part_view`, which always shows assembled geometry and can optionally select a stage. TSX authors use the proposed `<assembly.drawing.explosionview stageRef=".complete" moves={[{ includeStageRefs: [".rotor"], offZ: "40mm" }]} ... />` element. Stage records compose source components, PCB substrates and nested stages; a populated PCB or complete rotor can therefore move as one unit. Offsets are simultaneous CAD-world translations from assembled placement, multiplied by the view's optional factor (default 1). This is independent of ordered `cad_explosion_stage` playback.
+A `drawing_explosion_view` requires `drawing_assembly_stage_id` for reusable part membership and inline `moves` for a separated drawing pose. It shares viewport controls with `drawing_part_view`, which always shows assembled geometry and can optionally select a stage. TSX authors use the proposed `<assembly.drawing.explosionview stageRef="lift-rotor" ... />` element, referencing an existing `assembly.explosion.stage` and inheriting its `assembly.explosion.move` children. `moves` is compiled Circuit JSON data, not a drawing prop. Core must resolve the stage sequence and owner frames into final per-part translations before emission. Stage records compose source components, PCB substrates and nested stages; a populated PCB or complete rotor can therefore move as one unit. Offsets are simultaneous CAD-world translations from assembled placement, multiplied by the view's optional factor (default 1). The renderer consumes resolved poses; it does not execute ordered `cad_explosion_stage` playback.
 
 Use `resolveSceneParts` for these views. The callback returns placed PoppyGL draw calls tagged with exactly one `source_component_id` or `pcb_board_id` per entry. Multiple entries with the same identity are supported. The converter loads parts once, expands stage membership, copies model matrices, applies translations and renders with the existing outline pipeline. Cached input geometry is never mutated. `resolveScene` remains supported and is preferred for legacy views when both callbacks are supplied.
 
@@ -262,7 +262,7 @@ Schema: https://github.com/tscircuit/circuit-json/pull/1003
 
 TSX props: https://github.com/tscircuit/props/pull/1010
 
-The Circuit JSON dependency is temporarily pinned to the schema PR's immutable preview; replace it with the released version after that PR merges. Core TSX selector resolution/emission remains follow-up work. This implementation provides translation-only drawing poses, not automatic explosion planning, collision-free insertion paths, or vector B-rep output.
+The Circuit JSON dependency uses the published `circuit-json@^0.0.550`, which includes the merged drawing schema. Core TSX selector resolution/emission remains follow-up work. This implementation provides translation-only drawing poses, not automatic explosion planning, collision-free insertion paths, or vector B-rep output.
 
 Explosion views have their own `drawing_explosion_view_id`. Labels and resolved dimension lines use that field to attach to an exploded view, or `drawing_part_view_id` to attach to an assembled view (exactly one). `resolveSceneParts` is required for exploded views. The optional native-feature resolver receives either view type; samples for an exploded view must already include the drawing pose.
 
@@ -274,4 +274,4 @@ Labels and notes accept `x_offset_from_view_center` and `y_offset_from_view_cent
 
 The [anchor-alignment snapshot](tests/__snapshots__/drawing-anchor-alignment.snap.svg) checks equivalent layouts for all nine anchors, mixed annotation modes, viewport movement, dimensions, edge labels and physical paper bounds. All four fidget sheets use `bottom_left` alignment and view-relative part labels.
 
-Explosion settings are local to each view: `moves` is required and nonempty, `factor` defaults to 1 (0 restores assembly), and `show_trails` defaults to false. Move membership must not overlap within a view; different views may use different poses for the same stage. Migrate old documents by copying each standalone `drawing_explosion` configuration into its views and removing `drawing_explosion_id` references. The renderer rejects the removed standalone records.
+In Circuit JSON, resolved explosion settings are local to each view: `moves` is required and nonempty, `factor` defaults to 1 (0 restores assembly), and `show_trails` defaults to false. Move membership must not overlap within a view; different views may use different poses for the same stage. Migrate old documents by copying each standalone `drawing_explosion` configuration into its views and removing `drawing_explosion_id` references. The renderer rejects the removed standalone records.
