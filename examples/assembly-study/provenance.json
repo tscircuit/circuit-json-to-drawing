@@ -1,0 +1,12 @@
+{
+  "project_url": "https://tscircuit.com/rushabhcodes/fidget-counter#3d",
+  "published_version": "1.0.31",
+  "package_release_id": "897e68ca-ae6e-40bb-9c18-0a1cb543a604",
+  "glb_package_file_id": "4258b18d-0105-4f99-92ae-eb2cc8fda718",
+  "renderer_base_commit": "f8a59d83afa6763223c0eb3303c602aebf959002",
+  "coordinate_normalization": "Published GLB (-CAD.x,CAD.z,CAD.y) rotated pi around glTF Y into canonical (CAD.x,CAD.z,-CAD.y).",
+  "sha256": {
+    "examples/assembly-study/assets/assembly.glb": "e2a8c90c4411993717b37d5dd791244016c8b48fbdc544d61976367f21874463",
+    "examples/assembly-study/assets/source.circuit.json": "b20edf822d22c30e2116d9f90e6268ffd03ae4051f1027b2bb964842c534c743"
+  }
+}

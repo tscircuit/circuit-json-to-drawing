@@ -1,10 +1,11 @@
+import { paperToSvg } from "./paper"
+import type { DrawingView } from "./types"
+import { drawingViewId, isDrawingView, parseDrawingView } from "./view"
 import {
   drawing_page,
   drawing_page_title_block,
   type DrawingPageTitleBlock,
-  drawing_part_view,
   type DrawingPage,
-  type DrawingPartView,
 } from "circuit-json"
 import { parseDrawingDimensionLines } from "./dimension-document"
 import type { DrawingDocument } from "./types"
@@ -14,7 +15,7 @@ export function parseDrawingDocument(
   drawingPageId?: string,
 ) {
   const pages: DrawingPage[] = [],
-    views: DrawingPartView[] = []
+    views: DrawingView[] = []
   const titleBlocks: DrawingPageTitleBlock[] = []
   const titleBlockIds = new Set<string>()
   const titleBlockPages = new Set<string>()
@@ -40,13 +41,11 @@ export function parseDrawingDocument(
       titleBlockIds.add(block.drawing_page_title_block_id)
       titleBlockPages.add(block.drawing_page_id)
       titleBlocks.push(block)
-    } else if (record.type === "drawing_part_view") {
-      const view = drawing_part_view.parse(record)
-      if (viewIds.has(view.drawing_part_view_id))
-        throw new Error(
-          `Duplicate drawing part view ID: ${view.drawing_part_view_id}`,
-        )
-      viewIds.add(view.drawing_part_view_id)
+    } else if (isDrawingView(record)) {
+      const view = parseDrawingView(record)
+      if (viewIds.has(drawingViewId(view)))
+        throw new Error(`Duplicate drawing view ID: ${drawingViewId(view)}`)
+      viewIds.add(drawingViewId(view))
       views.push(view)
     } else if (record.type === "drawing_dimension") {
       throw new Error(
@@ -56,7 +55,7 @@ export function parseDrawingDocument(
       ["drawing", "drawing_view", "drawing_artifact"].includes(record.type)
     ) {
       throw new Error(
-        `Unsupported drawing element ${record.type}; use drawing_page and drawing_part_view configuration`,
+        `Unsupported drawing element ${record.type}; use drawing_page with drawing_part_view or drawing_explosion_view configuration`,
       )
     }
   }
@@ -75,14 +74,19 @@ export function parseDrawingDocument(
     const page = pages.find((p) => p.drawing_page_id === view.drawing_page_id)
     if (!page)
       throw new Error(
-        `Part view ${view.drawing_part_view_id} references missing drawing page ${view.drawing_page_id}`,
+        `Drawing view ${drawingViewId(view)} references missing drawing page ${view.drawing_page_id}`,
       )
+    const center = paperToSvg(view.center, page)
     if (
-      Math.abs(view.center.x) + view.width / 2 > page.width / 2 + 1e-9 ||
-      Math.abs(view.center.y) + view.height / 2 > page.height / 2 + 1e-9
+      !Number.isFinite(center.x) ||
+      !Number.isFinite(center.y) ||
+      center.x - view.width / 2 < -1e-9 ||
+      center.x + view.width / 2 > page.width + 1e-9 ||
+      center.y - view.height / 2 < -1e-9 ||
+      center.y + view.height / 2 > page.height + 1e-9
     )
       throw new Error(
-        `Part view ${view.drawing_part_view_id} extends outside its page`,
+        `Drawing view ${drawingViewId(view)} extends outside its page`,
       )
   }
   if (drawingPageId && !pageIds.has(drawingPageId))

@@ -1,10 +1,11 @@
+import { isOnPaper, paperToSvg } from "./paper"
 import type { DrawingDimensionLine, DrawingPage } from "circuit-json"
 import { escapeXml } from "./svg"
 import { drawingStyle } from "./drawing-style"
 
 type Point = DrawingDimensionLine["start"]
 
-/** Render an already resolved dimension in page-centered paper mm (+Y up).
+/** Render an already resolved dimension in page-anchor-relative paper mm (+Y up).
  * Model measurement, projection and placement belong to the producer. The
  * exporter preserves both line endpoints and the supplied text verbatim.
  */
@@ -87,20 +88,11 @@ export function renderDrawingDimensionLine(
   ]
   if (paperPoints.some((point) => ![point.x, point.y].every(Number.isFinite)))
     throw new Error("Dimension line exceeds finite paper coordinates")
-  if (
-    paperPoints.some(
-      (point) =>
-        Math.abs(point.x) > page.width / 2 - 1 ||
-        Math.abs(point.y) > page.height / 2 - 1,
-    )
-  )
+  if (paperPoints.some((point) => !isOnPaper(point, page, 1)))
     throw new Error(
       `Dimension line "${dimension.name ?? dimension.drawing_dimension_line_id}" extends outside its drawing page`,
     )
-  const svgPoint = (point: Point) => ({
-    x: page.width / 2 + point.x,
-    y: page.height / 2 - point.y,
-  })
+  const svgPoint = (point: Point) => paperToSvg(point, page)
   const line = (from: Point, to: Point, role: string) => {
     const p = svgPoint(from),
       q = svgPoint(to)

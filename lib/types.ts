@@ -1,16 +1,22 @@
 import type {
+  AnyCircuitElement,
   DrawingDimensionLineInput,
   DrawingPage,
   DrawingPartView,
+  DrawingExplosionView,
   DrawingPageTitleBlock,
 } from "circuit-json"
 import type { GLTFScene } from "poppygl"
+import type { DrawingScenePart } from "./assembly"
+
+export type DrawingView = DrawingPartView | DrawingExplosionView
 
 export interface CircuitElementLike {
   type: string
   [key: string]: unknown
 }
 export type DrawingDocument = readonly (
+  | AnyCircuitElement
   | DrawingDimensionLineInput
   | DrawingPage
   | DrawingPageTitleBlock
@@ -39,6 +45,11 @@ export interface NamedModelEdge extends ResolvedModelEdge {
 }
 
 export interface DrawingOptions {
+  /** Resolve the complete placed scene once, preserving part identity. Required for
+   * assembly/explosion views and part labels; legacy views prefer resolveScene when supplied. */
+  resolveSceneParts?: (
+    circuitJson: DrawingDocument,
+  ) => DrawingScenePart[] | Promise<DrawingScenePart[]>
   /** Select one configured page; omit to render all pages in document order. */
   drawingPageId?: string
   pixelsPerMm?: number
@@ -47,11 +58,12 @@ export interface DrawingOptions {
   /** Show small gray feature names. Disabled by default; does not affect lines. */
   showEdgeNames?: boolean
   /** Enumerate native named features only when showEdgeNames is enabled.
-   * Samples are CAD world mm (+Z up), using the same placement as resolveScene.
+   * Samples are CAD world mm (+Z up), using the same placement as the rendered view.
+   * For explosion views the caller must apply the selected drawing pose to samples.
    * This is an optional labeling adapter, never a dimension-measurement input.
    */
   resolveModelEdges?: (
-    partView: DrawingPartView,
+    partView: DrawingView,
     circuitJson: DrawingDocument,
   ) => readonly NamedModelEdge[] | Promise<readonly NamedModelEdge[]>
   /** Resolve the geometry selected by this part view, in glTF +Y-up mm.

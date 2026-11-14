@@ -1,4 +1,5 @@
-import type { DrawingPartView } from "circuit-json"
+import type { DrawingView } from "./types"
+
 import { mat4, vec4 } from "gl-matrix"
 import type { Camera } from "poppygl"
 import { cadToGltf } from "./coordinates"
@@ -9,7 +10,7 @@ import type { DrawingPoint } from "./types"
  */
 export function projectDrawingPoint(
   point: DrawingPoint,
-  view: DrawingPartView,
+  view: DrawingView,
   camera: Camera,
 ) {
   const clip = vec4.transformMat4(
