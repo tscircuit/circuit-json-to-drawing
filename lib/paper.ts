@@ -31,6 +31,35 @@ export function paperToSvg(point: Point, page: DrawingPage): Point {
   const anchor = drawingAnchor(page)
   return { x: anchor.x + point.x, y: page.height - (anchor.y + point.y) }
 }
+export function svgToPaper(point: Point, page: DrawingPage): Point {
+  const anchor = drawingAnchor(page)
+  return { x: point.x - anchor.x, y: page.height - point.y - anchor.y }
+}
+/** Top-left SVG corner of a width x height box whose named point sits at
+ * anchor, an SVG position. */
+export function anchoredBoxOrigin(
+  anchor: Point,
+  alignment: NonNullable<DrawingPage["anchor_alignment"]>,
+  width: number,
+  height: number,
+): Point {
+  return {
+    x:
+      anchor.x -
+      (alignment.endsWith("left")
+        ? 0
+        : alignment.endsWith("right")
+          ? width
+          : width / 2),
+    y:
+      anchor.y -
+      (alignment.startsWith("top")
+        ? 0
+        : alignment.startsWith("bottom")
+          ? height
+          : height / 2),
+  }
+}
 export function isOnPaper(point: Point, page: DrawingPage, margin = 0) {
   const p = paperToSvg(point, page)
   return (

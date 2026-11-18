@@ -8,4 +8,7 @@ export const drawingStyle = {
   witnessWidth: 0.15,
   witnessColor: "#777",
   textColor: "#222",
+  harnessOutlineWidth: 0.35,
+  harnessWireOutlineWidth: 0.25,
+  tableLineWidth: 0.25,
 } as const
