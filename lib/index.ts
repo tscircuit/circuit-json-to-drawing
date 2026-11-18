@@ -17,6 +17,10 @@ import {
   renderAssemblyPageNotes,
 } from "./assembly"
 export * from "./assembly"
+import { parseHarnessDrawing, renderHarnessPage } from "./harness"
+import { parseDrawingTables, renderDrawingTables } from "./table"
+export { parseHarnessDrawing, resolveCableEnds } from "./harness"
+export type { CableEnds, HarnessCable, HarnessDrawing } from "./harness"
 import type {
   DrawingDocument,
   DrawingOptions,
@@ -54,6 +58,8 @@ export async function convertCircuitJsonToDrawingPages(
     options.drawingPageId,
   )
   const assembly = parseAssemblyDrawing(input)
+  const harness = parseHarnessDrawing(input)
+  const tables = parseDrawingTables(input)
   let parts:
     | Awaited<ReturnType<NonNullable<DrawingOptions["resolveSceneParts"]>>>
     | undefined
@@ -76,7 +82,10 @@ export async function convertCircuitJsonToDrawingPages(
     const pageViews = views.filter(
       (v) => v.drawing_page_id === page.drawing_page_id,
     )
-    if (!pageViews.length)
+    const hasVectorContent = [...harness.views, ...tables.tables].some(
+      (record) => record.drawing_page_id === page.drawing_page_id,
+    )
+    if (!pageViews.length && !hasVectorContent)
       throw new Error(
         `Drawing page ${page.drawing_page_id} has no drawing views`,
       )
@@ -191,7 +200,15 @@ export async function convertCircuitJsonToDrawingPages(
         titleBlocks.find(
           (block) => block.drawing_page_id === page.drawing_page_id,
         ),
-      ).replace("</svg>", renderAssemblyPageNotes(input, page) + "</svg>"),
+      ).replace(
+        "</svg>",
+        // A function replacement keeps "$" in authored text literal.
+        () =>
+          renderHarnessPage(harness, page) +
+          renderDrawingTables(tables, page) +
+          renderAssemblyPageNotes(input, page) +
+          "</svg>",
+      ),
     })
   }
   return output
