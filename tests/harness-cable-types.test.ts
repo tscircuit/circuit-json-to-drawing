@@ -32,8 +32,8 @@ test("harness views cover jacketed cables, mixed-pitch adapters and straight-thr
     ...extra,
   })
   const view = (cad_cable_id: string, y: number) => ({
-    type: "drawing_harness_view" as const,
-    drawing_harness_view_id: `view_${cad_cable_id}`,
+    type: "drawing_wiring_harness_view" as const,
+    drawing_wiring_harness_view_id: `view_${cad_cable_id}`,
     drawing_page_id: "page",
     cad_cable_id,
     center: { x: -38, y },

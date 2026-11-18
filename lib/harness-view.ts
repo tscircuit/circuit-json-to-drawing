@@ -2,7 +2,7 @@ import type { CableConnector } from "@tscircuit/cableprinter"
 import type {
   DrawingBalloon,
   DrawingDimensionLine,
-  DrawingHarnessView,
+  DrawingWiringHarnessView,
   DrawingPage,
 } from "circuit-json"
 import { contactCount } from "./cable-ends"
@@ -155,12 +155,12 @@ function balloonSvg(balloon: DrawingBalloon, target: Point, page: DrawingPage) {
 /** Draw one cable flattened: from end at left, to end at right, one ribbon per
  * wire. Connectors use view scale; the span between them is schematic. */
 export function renderHarnessView(
-  view: DrawingHarnessView,
+  view: DrawingWiringHarnessView,
   page: DrawingPage,
   { cable, ends, wires }: HarnessCable,
   balloons: DrawingBalloon[],
 ) {
-  const id = view.drawing_harness_view_id
+  const id = view.drawing_wiring_harness_view_id
   const center = paperToSvg(view.center, page)
   const left = center.x - view.width / 2
   const top = center.y - view.height / 2
@@ -396,5 +396,5 @@ export function renderHarnessView(
     : ""
 
   const name = escapeXml(view.display_name ?? view.name ?? cable.name)
-  return `<g data-drawing-harness-view-id="${escapeXml(id)}"><title>${name}</title>${wireSvg}${connectorSvg(from, scale)}${connectorSvg(to, scale)}${ring}${labels}${dimension}${callouts}<text x="${center.x}" y="${top + view.height + 3.5}" text-anchor="middle" font-size="2.8">${name} · LENGTH NOT TO SCALE</text></g>`
+  return `<g data-drawing-wiring-harness-view-id="${escapeXml(id)}"><title>${name}</title>${wireSvg}${connectorSvg(from, scale)}${connectorSvg(to, scale)}${ring}${labels}${dimension}${callouts}<text x="${center.x}" y="${top + view.height + 3.5}" text-anchor="middle" font-size="2.8">${name} · LENGTH NOT TO SCALE</text></g>`
 }

@@ -61,8 +61,8 @@ test("crossed wires are drawn as separate, traceable crossings for any wiring", 
     })),
   ]
   const view = (cad_cable_id: string, y: number, height: number) => ({
-    type: "drawing_harness_view" as const,
-    drawing_harness_view_id: `view_${cad_cable_id}`,
+    type: "drawing_wiring_harness_view" as const,
+    drawing_wiring_harness_view_id: `view_${cad_cable_id}`,
     drawing_page_id: "page",
     cad_cable_id,
     center: { x: 0, y },
@@ -78,6 +78,6 @@ test("crossed wires are drawn as separate, traceable crossings for any wiring", 
     view("straight_8", 6, 86),
     view("mixed_5", -82, 70),
   ])
-  expect(svg.match(/data-drawing-harness-view-id/g)).toHaveLength(3)
+  expect(svg.match(/data-drawing-wiring-harness-view-id/g)).toHaveLength(3)
   await expect(svg).toMatchSvgSnapshot(import.meta.path)
 })

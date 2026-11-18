@@ -4,10 +4,10 @@ import {
   cad_cable,
   cad_cable_wire,
   type DrawingBalloon,
-  type DrawingHarnessView,
+  type DrawingWiringHarnessView,
   type DrawingPage,
   drawing_balloon,
-  drawing_harness_view,
+  drawing_wiring_harness_view,
   drawing_page,
 } from "circuit-json"
 import { type CableEnds, contactCount, resolveCableEnds } from "./cable-ends"
@@ -24,7 +24,7 @@ export interface HarnessCable {
 /** Scalar validation belongs to circuit-json; references, pin ranges and paper
  * bounds are validated here, before any geometry is resolved. */
 export function parseHarnessDrawing(input: DrawingDocument) {
-  const views: DrawingHarnessView[] = []
+  const views: DrawingWiringHarnessView[] = []
   const balloons: DrawingBalloon[] = []
   const ids = new Set<string>()
   const unique = (kind: string, id: string) => {
@@ -32,9 +32,9 @@ export function parseHarnessDrawing(input: DrawingDocument) {
     ids.add(`${kind}:${id}`)
   }
   for (const record of input) {
-    if (record.type === "drawing_harness_view") {
-      const view = drawing_harness_view.parse(record)
-      unique("drawing harness view", view.drawing_harness_view_id)
+    if (record.type === "drawing_wiring_harness_view") {
+      const view = drawing_wiring_harness_view.parse(record)
+      unique("drawing harness view", view.drawing_wiring_harness_view_id)
       views.push(view)
     } else if (record.type === "drawing_balloon") {
       const balloon = drawing_balloon.parse(record)
@@ -126,7 +126,7 @@ export function parseHarnessDrawing(input: DrawingDocument) {
   for (const view of views) {
     const page = pageOf(
       "Harness view",
-      view.drawing_harness_view_id,
+      view.drawing_wiring_harness_view_id,
       view.drawing_page_id,
     )
     const center = paperToSvg(view.center, page)
@@ -137,17 +137,19 @@ export function parseHarnessDrawing(input: DrawingDocument) {
       center.y + view.height / 2 > page.height + 1e-9
     )
       throw Error(
-        `Harness view ${view.drawing_harness_view_id} extends outside its page`,
+        `Harness view ${view.drawing_wiring_harness_view_id} extends outside its page`,
       )
   }
   for (const balloon of balloons)
     if (
       !views.some(
-        (v) => v.drawing_harness_view_id === balloon.drawing_harness_view_id,
+        (v) =>
+          v.drawing_wiring_harness_view_id ===
+          balloon.drawing_wiring_harness_view_id,
       )
     )
       throw Error(
-        `Balloon ${balloon.drawing_balloon_id} references missing harness view ${balloon.drawing_harness_view_id}`,
+        `Balloon ${balloon.drawing_balloon_id} references missing harness view ${balloon.drawing_wiring_harness_view_id}`,
       )
   return { views, balloons, cables }
 }

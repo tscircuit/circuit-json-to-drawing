@@ -18,7 +18,9 @@ export function renderHarnessPage(harness: HarnessDrawing, page: DrawingPage) {
         page,
         harness.cables.get(view.cad_cable_id)!,
         harness.balloons.filter(
-          (b) => b.drawing_harness_view_id === view.drawing_harness_view_id,
+          (b) =>
+            b.drawing_wiring_harness_view_id ===
+            view.drawing_wiring_harness_view_id,
         ),
       ),
     )

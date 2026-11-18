@@ -6,7 +6,7 @@ import { motorCableHarness } from "./fixtures/motor-cable-harness"
 test("a cable manufacturing sheet renders from cable, wire, table and balloon records without a scene resolver", async () => {
   const harness = motorCableHarness()
   const svg = await convertCircuitJsonToDrawingSvg(harness.document)
-  expect(svg).toContain('data-drawing-harness-view-id="harness"')
+  expect(svg).toContain('data-drawing-wiring-harness-view-id="harness"')
   expect(svg.match(/data-drawing-table-id/g)).toHaveLength(2)
   expect(svg.match(/data-drawing-table-cell-id/g)).toHaveLength(31)
   expect(svg.match(/data-drawing-balloon-id/g)).toHaveLength(3)
@@ -86,7 +86,7 @@ test("a cable manufacturing sheet renders from cable, wire, table and balloon re
       anchor_position: { x: 293, y: 180 },
     }),
     "balloon without its view": replace(harness.balloons[0]!, {
-      drawing_harness_view_id: "missing",
+      drawing_wiring_harness_view_id: "missing",
     }),
     "balloon without an anchor": replace(harness.balloons[0]!, {
       anchor_position: undefined,

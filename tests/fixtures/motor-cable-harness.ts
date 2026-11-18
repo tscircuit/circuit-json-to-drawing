@@ -2,7 +2,7 @@ import type {
   CadCable,
   CadCableWire,
   DrawingBalloon,
-  DrawingHarnessView,
+  DrawingWiringHarnessView,
   DrawingPage,
   DrawingPageNote,
   DrawingPageTitleBlock,
@@ -65,9 +65,9 @@ export function motorCableHarness() {
     wire_awg: 22,
     wire_style: "UL1007",
   }))
-  const view: DrawingHarnessView = {
-    type: "drawing_harness_view",
-    drawing_harness_view_id: "harness",
+  const view: DrawingWiringHarnessView = {
+    type: "drawing_wiring_harness_view",
+    drawing_wiring_harness_view_id: "harness",
     drawing_page_id: "page",
     cad_cable_id: "cad_cable_motor",
     center: { x: 148.5, y: 148 },
@@ -124,7 +124,7 @@ export function motorCableHarness() {
     {
       type: "drawing_balloon",
       drawing_balloon_id: "balloon_from",
-      drawing_harness_view_id: "harness",
+      drawing_wiring_harness_view_id: "harness",
       texts: ["3", "2"],
       harness_target: "from_connector",
       anchor_position: { x: 54, y: 175 },
@@ -133,7 +133,7 @@ export function motorCableHarness() {
     {
       type: "drawing_balloon",
       drawing_balloon_id: "balloon_wires",
-      drawing_harness_view_id: "harness",
+      drawing_wiring_harness_view_id: "harness",
       texts: ["1"],
       harness_target: "wires",
       anchor_position: { x: 110, y: 173 },
@@ -142,7 +142,7 @@ export function motorCableHarness() {
     {
       type: "drawing_balloon",
       drawing_balloon_id: "balloon_to",
-      drawing_harness_view_id: "harness",
+      drawing_wiring_harness_view_id: "harness",
       texts: ["3", "4"],
       harness_target: "to_connector",
       anchor_position: { x: 243, y: 169 },
