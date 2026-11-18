@@ -63,7 +63,6 @@ export function motorCableHarness() {
     to_pin_number: to_pin_number!,
     color: "black",
     wire_awg: 22,
-    wire_style: "UL1007",
   }))
   const view: DrawingWiringHarnessView = {
     type: "drawing_wiring_harness_view",
