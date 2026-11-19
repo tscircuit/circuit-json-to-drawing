@@ -246,6 +246,8 @@ const pages = await convertCircuitJsonToDrawingPages(circuitJson, {
 })
 ```
 
+`createDrawingScenePartsResolver({ circuitJson, converter, modelOptions })` adapts the caller's `circuit-json-to-gltf` module into a `resolveSceneParts` callback. Reuse the callback across pages to share loaded geometry. `modelOptions` optionally supplies the project base URL and model download headers.
+
 `drawing_part_label` follows its target's displacement while retaining an authored paper-space text position. `drawing_page_note` adds escaped plain text to a page. Duplicate IDs, unknown references, cyclic stages, overlapping move targets, mismatched label translations, missing selected geometry and invalid scalar configuration are rejected. Native edge samples returned by `resolveModelEdges` must already use the displayed pose; resolved dimension lines and paper label positions are not automatically remeasured or relaid out.
 
 The [fidget-counter example](examples/assembly-study/README.md) includes the actual published geometry, complete Circuit JSON, a runnable renderer and **four visual snapshot tests** covering a full explosion, stationary stages, rotor stages and final assembly.

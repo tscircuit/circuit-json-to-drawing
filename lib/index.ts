@@ -38,6 +38,7 @@ export type {
   NamedModelEdge,
 } from "./types"
 export { cadToGltf, sectionToGltf, getViewOrientation } from "./coordinates"
+export { createDrawingScenePartsResolver } from "./gltf"
 
 /** Render configured pages. Rendered files are exporter output, not Circuit JSON records. */
 export async function convertCircuitJsonToDrawingPages(
