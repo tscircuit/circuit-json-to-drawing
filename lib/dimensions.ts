@@ -40,10 +40,9 @@ export function renderDrawingDimensionLine(
   })
   const textWidth = Math.max(4, [...dimension.text].length * 1.8)
   const outside = span < textWidth + 7
-  const labelPosition = outside
+  const labelCenter = outside
     ? add(end, tangent, textWidth / 2 + 7)
     : { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 }
-  const labelCenter = add(labelPosition, textNormal, 1.8)
   const arrowPoints = (tip: Point, direction: number): Point[] => {
     const base = add(tip, tangent, direction * 2.5)
     return [tip, add(base, textNormal, 0.8), add(base, textNormal, -0.8)]
@@ -119,7 +118,7 @@ export function renderDrawingDimensionLine(
     )
   const angle = (-Math.atan2(textTangent.y, textTangent.x) * 180) / Math.PI
   const text = svgPoint(labelCenter)
-  const svg = `<g data-drawing-dimension-line-id="${escapeXml(dimension.drawing_dimension_line_id)}" fill="none" stroke="${drawingStyle.dimensionColor}" stroke-width="${drawingStyle.dimensionWidth}"><title>${escapeXml(dimension.name ?? dimension.text)}</title>${drawingLines.join("")}${arrow(start, outside ? -1 : 1)}${arrow(end, outside ? 1 : -1)}<g transform="translate(${text.x} ${text.y}) rotate(${angle})"><rect x="${-textWidth / 2 - 0.6}" y="-1.5" width="${textWidth + 1.2}" height="3.5" fill="white" stroke="none"/><text xml:space="preserve" text-anchor="middle" dominant-baseline="middle" font-size="3" fill="${drawingStyle.textColor}" stroke="none">${escapeXml(dimension.text)}</text></g></g>`
+  const svg = `<g data-drawing-dimension-line-id="${escapeXml(dimension.drawing_dimension_line_id)}" fill="none" stroke="${drawingStyle.dimensionColor}" stroke-width="${drawingStyle.dimensionWidth}"><title>${escapeXml(dimension.name ?? dimension.text)}</title>${drawingLines.join("")}${arrow(start, outside ? -1 : 1)}${arrow(end, outside ? 1 : -1)}<g transform="translate(${text.x} ${text.y}) rotate(${angle})"><rect x="${-textWidth / 2 - 0.6}" y="-1.75" width="${textWidth + 1.2}" height="3.5" fill="white" stroke="none"/><text xml:space="preserve" text-anchor="middle" dominant-baseline="middle" font-size="3" fill="${drawingStyle.textColor}" stroke="none">${escapeXml(dimension.text)}</text></g></g>`
   const labelBounds = {
     left: Math.min(...labelCorners.map((point) => point.x)),
     right: Math.max(...labelCorners.map((point) => point.x)),
