@@ -81,7 +81,9 @@ test("resolved paper endpoints preserve authored text and independently optional
   expect(rendered[0]!.svg).toContain('d="M 50 74 L 50 53"')
   expect(rendered[0]!.svg).toContain("80.000 mm ±0.05</text>")
   expect(rendered[2]!.svg).toContain("R 12.5 &lt;ref&gt; &amp; nominal</text>")
-  expect(rendered[3]!.svg).toContain("rotate(0)")
+  expect(rendered[0]!.svg).toContain("translate(100 55) rotate(0)")
+  expect(rendered[1]!.svg).toContain("translate(60 177.5) rotate(-90)")
+  expect(rendered[3]!.svg).toContain("translate(310 55) rotate(0)")
   expect(rendered[0]!.svg).not.toContain("data-measured-value")
   for (const [index, result] of rendered.entries()) {
     expect(result.start).toEqual(lines[index]!.start)
