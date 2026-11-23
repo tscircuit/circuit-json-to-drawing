@@ -6,6 +6,7 @@ import {
   createOutlineSection,
 } from "poppygl"
 import { renderDrawingDimensionLine } from "./dimensions"
+import { joinOutlinePrimitives } from "./outline-primitives"
 import { drawingStyle } from "./drawing-style"
 import { renderEdgeNames } from "./edge-names"
 import { parseDrawingDocument } from "./document"
@@ -13,10 +14,20 @@ import { getViewOrientation, sectionToGltf } from "./coordinates"
 import { pageToSvg, toBase64 } from "./svg"
 import {
   parseAssemblyDrawing,
+  prepareOutlineParts,
   resolveAssemblyView,
   renderAssemblyPageNotes,
 } from "./assembly"
-export * from "./assembly"
+export { parseAssemblyDrawing, resolveAssemblyView, renderAssemblyPageNotes }
+export type {
+  DrawingPartSelection,
+  DrawingAssemblyStage,
+  DrawingExplosionView,
+  DrawingExplosionMove,
+  DrawingPartLabel,
+  DrawingPageNote,
+  DrawingScenePart,
+} from "./assembly"
 import { parseHarnessDrawing, renderHarnessPage } from "./harness"
 import { parseDrawingTables, renderDrawingTables } from "./table"
 export { parseHarnessDrawing, resolveCableEnds } from "./harness"
@@ -106,7 +117,7 @@ export async function convertCircuitJsonToDrawingPages(
       const useParts =
         needsAssembly || (!options.resolveScene && !!options.resolveSceneParts)
       if (useParts && options.resolveSceneParts)
-        parts ??= await options.resolveSceneParts(input)
+        parts ??= prepareOutlineParts(await options.resolveSceneParts(input))
       const prepared =
         useParts && parts
           ? resolveAssemblyView(drawingViewId(view), parts, assembly)
@@ -138,10 +149,15 @@ export async function convertCircuitJsonToDrawingPages(
       ) as [number, number, number]
       const width = Math.max(1, Math.round(view.width * pixelsPerMm)),
         height = Math.max(1, Math.round(view.height * pixelsPerMm))
+      const geometry = prepared
+        ? scene.drawCalls
+        : joinOutlinePrimitives(
+            scene.drawCalls,
+            view.source_component_ids?.length === 1,
+          )
       const renderedGeometry = view.section
-        ? createOutlineSection(scene.drawCalls, sectionToGltf(view.section))
-            .drawCalls
-        : scene.drawCalls
+        ? createOutlineSection(geometry, sectionToGltf(view.section)).drawCalls
+        : geometry
       if (
         !renderedGeometry.some(
           (drawCall) =>

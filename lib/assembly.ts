@@ -8,6 +8,7 @@ import {
   parseDrawingView,
 } from "./view"
 import { mat4 } from "gl-matrix"
+import { joinOutlinePrimitives } from "./outline-primitives"
 import {
   computeWorldAABB,
   type DrawCall,
@@ -54,6 +55,26 @@ const key = (part: DrawingScenePart) => {
     ? `source:${part.source_component_id}`
     : `board:${part.pcb_board_id}`
 }
+/** Normalize primitive batches once, before applying per-view explosion poses. */
+export function prepareOutlineParts(
+  parts: DrawingScenePart[],
+): DrawingScenePart[] {
+  const groups = new Map<string, DrawingScenePart>()
+  for (const part of parts) {
+    const id = key(part)
+    let group = groups.get(id)
+    if (!group) {
+      group = { ...part, drawCalls: [] }
+      groups.set(id, group)
+    }
+    for (const call of part.drawCalls) group.drawCalls.push(call)
+  }
+  return Array.from(groups.values(), (part) => ({
+    ...part,
+    drawCalls: joinOutlinePrimitives(part.drawCalls, true),
+  }))
+}
+
 function resolveNotePosition(
   note: DrawingPageNote,
   views: Map<string, DrawingView>,
