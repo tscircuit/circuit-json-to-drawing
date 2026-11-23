@@ -19,7 +19,7 @@
     "format:check": "biome format ."
   },
   "dependencies": {
-    "poppygl": "^0.0.37",
+    "poppygl": "^0.0.40",
     "circuit-json": "^0.0.556",
     "@tscircuit/alphabet": "0.0.25",
     "@tscircuit/cableprinter": "^0.0.6",
