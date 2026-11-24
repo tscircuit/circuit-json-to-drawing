@@ -20,6 +20,10 @@ const sideGutter = 18
 const balloonBand = 17
 const dimensionBand = 15
 const balloonRadius = 2.8
+/** Paper mm a connector designator may occupy, centered 13 mm outside the
+ * connector, and the smallest text it is shrunk to before growing outward. */
+const designatorRoom = 11.5
+const designatorMinSize = 2.8
 
 const formatMm = (value: number) => String(Number(value.toFixed(2)))
 const outline = `fill="white" stroke="black" stroke-width="${drawingStyle.harnessOutlineWidth}"`
@@ -325,7 +329,27 @@ export function renderHarnessView(
       (connector.kind === "usb_c_plug"
         ? outward * connector.shellDepth * scale
         : 0)
-    labels += text({ x: outerX + outward * 13, y: centerY }, 5, "middle", name)
+    // Designators share the gutter outside the pin numbers. A long name is
+    // set smaller to fit it; past the smallest size it grows outward instead.
+    const nameWidth = (size: number) => 0.62 * size * name.length
+    const nameSize = Math.max(
+      designatorMinSize,
+      Math.min(5, designatorRoom / nameWidth(1)),
+    )
+    labels +=
+      nameWidth(nameSize) <= designatorRoom + 1e-9
+        ? text(
+            { x: outerX + outward * 13, y: centerY },
+            nameSize,
+            "middle",
+            name,
+          )
+        : text(
+            { x: outerX + outward * (13 - designatorRoom / 2), y: centerY },
+            nameSize,
+            outward < 0 ? "end" : "start",
+            name,
+          )
     const count = contactCount(connector)
     if (!count) continue
     // Every populated cavity is numbered when the pitch leaves room; the
