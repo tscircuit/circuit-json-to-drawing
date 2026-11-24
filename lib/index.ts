@@ -77,7 +77,9 @@ export async function convertCircuitJsonToDrawingPages(
         `Drawing view ${drawingViewId(view)} exceeds maxRasterPixels`,
       )
   }
-  const output: DrawingPageOutput[] = []
+  // Dimension bounds and empty pages are document errors. Validate them before
+  // invoking user geometry resolvers, which may load large or remote models.
+  const renderedDimensionSvgs = new Map<string, string>()
   for (const page of pages) {
     const pageViews = views.filter(
       (v) => v.drawing_page_id === page.drawing_page_id,
@@ -89,6 +91,21 @@ export async function convertCircuitJsonToDrawingPages(
       throw new Error(
         `Drawing page ${page.drawing_page_id} has no drawing views`,
       )
+    for (const view of pageViews)
+      for (const line of dimensionLines.filter((line) =>
+        annotationTargetsView(line, view),
+      ))
+        renderedDimensionSvgs.set(
+          line.drawing_dimension_line_id,
+          renderDrawingDimensionLine(line, page).svg,
+        )
+  }
+
+  const output: DrawingPageOutput[] = []
+  for (const page of pages) {
+    const pageViews = views.filter(
+      (v) => v.drawing_page_id === page.drawing_page_id,
+    )
     const rendered: Parameters<typeof pageToSvg>[1] = []
     for (const view of pageViews) {
       const assemblyView = assembly.views.get(drawingViewId(view))
@@ -177,7 +194,10 @@ export async function convertCircuitJsonToDrawingPages(
       const dimensionSvg =
         (prepared?.annotations(page, view, camera) ?? "") +
         viewLines
-          .map((line) => renderDrawingDimensionLine(line, page).svg)
+          .map(
+            (line) =>
+              renderedDimensionSvgs.get(line.drawing_dimension_line_id)!,
+          )
           .join("") +
         (options.showEdgeNames
           ? renderEdgeNames(
